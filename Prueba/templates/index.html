@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <h1>Inicio de sesión</h1>
+    {%with mensajes= get_flashed_messages()%}
+        {% if mensajes%}
+            {%for msj in mensajes%}
+                <h3> {{ msj }} </h3>
+            {%endfor%}
+        {% endif %}
+    {%endwith%}
+    <div class="form-main">
+        <div class="form-conte">
+            <div class="box">
+                <form action="/login" method="POST">
+                    <div class="input-box">
+                        <label>Matricula: </label>
+                        <input type="text" name="matricula" placeholder="Matricula" class="input-control" required>
+                    </div>
+                    
+                    <div class="input-box">
+                        <label>Contaseña: </label>
+                        <input type="password" name="contrasena" placeholder="Contraseña" class="input-control" required>
+                        <div class="input-link">
+                            <a href="#" class="gradient-text"></a>
+                        </div>
+                            <a href="#" class="gradient-text"></a>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn">Iniciar sesión</button>
+                    <a href="{{ url_for('registro') }}">Registrarme</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
