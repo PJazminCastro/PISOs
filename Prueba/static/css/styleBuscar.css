@@ -97,12 +97,19 @@ body::after{
 
 .conteiner{
     border: solid 1px rgba(255, 255, 255, 0.2);
+    width: 80%; 
+    max-width: 800px; 
+    margin: 0 auto;
 }
 table{
     color: #fff;
     font-size: 14px;
     table-layout: fixed;
     border-collapse: collapse;
+}
+.table-container {
+    max-height: 300px;
+    overflow: auto;
 }
 thead{
     background: rgba(140, 159, 243, 0.4);

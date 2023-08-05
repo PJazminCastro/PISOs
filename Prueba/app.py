@@ -92,7 +92,7 @@ def login():
         else:
             flash('Correo o contraseña oncorrector.')
             return redirect(url_for('login'))
-    return render_template('login.html')
+    return render_template('index.html')
 
 @app.route('/main', methods=['GET'])
 def main():
@@ -137,12 +137,12 @@ def buscar():
     if request.method == 'POST':
         VBusc = request.form['busc']
         
-        cursorBU = pyodbc.connect.cursor()
+        cursorBU = conexion.cursor()
         if not VBusc:
-            cursorBU.execute('select Tickets.folio_ticket, personas.nombre, personas.ap, platillos.nombreP, Tickets.cantidad, sum(tickets.cantidad *  platillos.costo) as Total from Tickets inner join clientes on clientes.id = Tickets.idcliente inner join personas on personas.id = clientes.idpersona inner join platillos on platillos.id = Tickets.idplatillo where folio_ticket = ? group by Tickets.folio_ticket, personas.nombre, personas.ap, platillos.nombreP, Tickets.cantidad')
+            cursorBU.execute('SELECT tickets.ID, tickets.folio_ticket, tickets.idcliente, platillos.nombreP, tickets.cantidad FROM tickets  INNER JOIN platillos ON tickets.idplatillo = platillos.ID')
 
         else:
-            cursorBU.execute('select Tickets.folio_ticket, personas.nombre, personas.ap, platillos.nombreP, Tickets.cantidad, sum(tickets.cantidad *  platillos.costo) as Total from Tickets inner join clientes on clientes.id = Tickets.idcliente inner join personas on personas.id = clientes.idpersona inner join platillos on platillos.id = Tickets.idplatillo where folio_ticket = ? group by Tickets.folio_ticket, personas.nombre, personas.ap, platillos.nombreP, Tickets.cantidad', VBusc)
+            cursorBU.execute('SELECT tickets.ID, tickets.folio_ticket, personas.nombre, platillos.nombreP, tickets.cantidad, sum(tickets.cantidad *  platillos.costo) FROM tickets  INNER JOIN platillos ON tickets.idplatillo = platillos.ID INNER JOIN clientes on tickets.idcliente = clientes.id INNER JOIN personas on clientes.idpersona = personas.id  WHERE folio_ticket = ? group by tickets.id, Tickets.folio_ticket, personas.nombre, platillos.nombreP, Tickets.cantidad', (VBusc,))
         consBP = cursorBU.fetchall()
         
         if consBP is not None:
@@ -151,11 +151,11 @@ def buscar():
             mensaje = 'No se encontraron resultados.'
             return render_template('buscar_pedido.html', mensaje=mensaje)
     cursorBU = conexion.cursor()
-    cursorBU.execute(cursorBU.execute('select Tickets.folio_ticket, personas.nombre, personas.ap, platillos.nombreP, Tickets.cantidad, sum(tickets.cantidad *  platillos.costo) as Total from Tickets inner join clientes on clientes.id = Tickets.idcliente inner join personas on personas.id = clientes.idpersona inner join platillos on platillos.id = Tickets.idplatillo where folio_ticket = ? group by Tickets.folio_ticket, personas.nombre, personas.ap, platillos.nombreP, Tickets.cantidad'))
+    cursorBU.execute('SELECT tickets.ID, tickets.folio_ticket, personas.nombre, platillos.nombreP, tickets.cantidad, sum(tickets.cantidad *  platillos.costo) FROM tickets  INNER JOIN platillos ON tickets.idplatillo = platillos.ID INNER JOIN clientes on tickets.idcliente = clientes.id INNER JOIN personas on clientes.idpersona = personas.id group by tickets.id, Tickets.folio_ticket, personas.nombre, platillos.nombreP, Tickets.cantidad')
     consBU = cursorBU.fetchall()
     return render_template('buscar_pedido.html', listaPedido=consBU)
 
-#VER ACTUALIZACIONES
+#VER ACTUALIZACIONES USUARIOS
 @app.route('/visualizarAct/<string:id>')
 def visualizar(id):
     cursorVis = conexion.cursor()
@@ -173,7 +173,7 @@ def actualizar(id):
         varCorreo = request.form['txtCorreo']
         varContraseña = request.form['txtContraseña']
         cursorUpd = conexion.cursor()
-        cursorUpd.execute('update usuario set Nombre = ?, Ap = ?, Am = ?, Correo = ?, Contraseña = ? where Matricula = ?', ( varNombre, varAp, varAm, varCorreo, varContraseña, id))
+        cursorUpd.execute('update usuarios set Nombre = ?, Ap = ?, Am = ?, Correo = ?, Contraseña = ? where Matricula = ?', ( varNombre, varAp, varAm, varCorreo, varContraseña, id))
         cursorUpd.commit()
     flash ('El usuario con Matricula' + id +  'se actualizo correctamente.')
     return redirect(url_for('buscaru'))
@@ -268,17 +268,42 @@ def nuevo():
         return redirect(url_for('main'))
     return render_template('Nuevo.html')
 
+#BUSCAR INGREDIENTES
+@app.route('/buscari', methods=['GET', 'POST'])
+def buscarI():
+    if request.method == 'POST':
+        VBusc = request.form['busc']
+        
+        cursorBU = conexion.cursor()
+        if not VBusc:
+            cursorBU.execute('SELECT * FROM ingredientes')
+        else:
+            cursorBU.execute('SELECT * FROM ingredientes WHERE nombre = ?', str(VBusc))
+        consBU = cursorBU.fetchall()
+        
+        if consBU is not None:
+            return render_template('ingredientes.html', listaIngredientes=consBU)
+        else:
+            mensaje = 'No se encontraron resultados.'
+            return render_template('ingredientes.html', mensaje=mensaje)
+    
+    cursorBU = conexion.cursor()
+    cursorBU.execute('SELECT * FROM ingredientes')
+    consBU = cursorBU.fetchall()
+    return render_template('ingredientes.html', listaIngredientes=consBU)
+
 #BUSCAR MENU DEL DIA
 @app.route('/buscarm', methods=['GET', 'POST'])
 def buscarm():
     if request.method == 'POST':
         VBusc = request.form['busc']
+        VDisp = "Disponible"
         
-        cursorBU = conexion()
+        cursorBU = conexion.cursor()
         if not VBusc:
             cursorBU.execute('SELECT * FROM platillos')
         else:
-            cursorBU.execute('SELECT * FROM platillos WHERE estatus = ? and estatus = "Disponible"', (VBusc,))
+            cursorBU.execute('SELECT * FROM platillos WHERE nombreP = ? and estatus = ?', VBusc, VDisp)
         consBU = cursorBU.fetchall()
         
         if consBU is not None:
@@ -310,6 +335,26 @@ def eliminarBDm(id):
     cursorDlt.execute('delete from platillo where ID = ?', (id,))
     cursorDlt.commit()
     flash('Se elimino el producto')
+    return redirect(url_for('buscarm'))
+
+#VER ACTUALIZACIONES MENU
+@app.route('/visualizarMen/<string:id>')
+def visualizarMen(id):
+    cursorVis = conexion.cursor()
+    cursorVis.execute('select * from platillos where id = ?', id)
+    visualisarDatos = cursorVis.fetchone()
+    return render_template('actualizar_menu.html', UpdMenu = visualisarDatos)
+
+#ACTUALIZAR PRODUCTOS
+@app.route('/actualizarm/<id>', methods=['POST'])
+def actualizarP(id):
+    if request.method == 'POST':
+        varPlatillo = request.form['txtPlatillo']
+        varPrecio = request.form['txtPrecio']
+        cursorUpd = conexion.cursor()
+        cursorUpd.execute('update platillos set nombreP = ?, costo = ? where id = ?', ( varPlatillo, varPrecio, id))
+        cursorUpd.commit()
+    flash ('El platillo  ' + varPlatillo +  ' se actualizo correctamente.')
     return redirect(url_for('buscarm'))
 
 #REGISTRO ADMINISTRADOR

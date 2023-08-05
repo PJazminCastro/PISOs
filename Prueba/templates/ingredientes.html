@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar pedido</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleBuscar.css') }}">
+</head>
+<body>
+    <form action="/buscari" method="post">
+        <div class="contenedor">
+            <h1>Ingredientes</h1>
+            <div class="input-box">
+                <input type="text" name="busc" placeholder="Ingrediente" class="input-control">
+            </div>
+            <button type="submit" class="btn">Buscar</button>
+        </div>
+        <div class="container">
+            <div class="table-container">
+                <table>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if listaIngredientes %}
+                            {% for alb in listaIngredientes %} 
+                            <tr>
+                                <td> {{ alb.0 }} </td>
+                                <td> {{ alb.1 }} </td>
+                                <td> {{ alb.2 }} </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="5">No se encontraron resultados</td>
+                              </tr>
+                            {% endif %}
+                        </tbody>
+                </table>
+            </div>
+        </div>
+        <br>
+        <br>
+        <a href="/main" class="btn">Regresar al menú principal</a>
+    </form>   
+</body>
+</html>

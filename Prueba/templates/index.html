@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleRegistro.css') }}">
     <title>Login</title>
 </head>
 <body>
@@ -19,12 +20,10 @@
             <div class="box">
                 <form action="/login" method="POST">
                     <div class="input-box">
-                        <label>Matricula: </label>
                         <input type="text" name="matricula" placeholder="Matricula" class="input-control" required>
                     </div>
                     
                     <div class="input-box">
-                        <label>Contaseña: </label>
                         <input type="password" name="contrasena" placeholder="Contraseña" class="input-control" required>
                         <div class="input-link">
                             <a href="#" class="gradient-text"></a>

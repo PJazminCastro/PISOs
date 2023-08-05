@@ -30,10 +30,10 @@
                         <th>Matricula</th>
                         <th>Nombre</th>
                         <th>Apellido paterno</th>
-                        <th>Apellido materno</th>
                         <th>Correo</th>
                         <th>Rol</th>
                         <th>Acciones</th>
+                        <th>Metodo de pago</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,9 +43,8 @@
                         <td> {{ alb.0 }} </td>
                         <td> {{ alb.1 }} </td>
                         <td> {{ alb.2 }} </td>
-                        <td> {{ alb.3 }} </td>
                         <td> {{ alb.4 }} </td>
-                        {%if alb.5 == 2 %}
+                        {%if alb.6 == 2 %}
                         <td> Usuario </td>
                         {% else %}
                         <td> Administrador </td>
@@ -53,9 +52,9 @@
                    
                         <td> 
                             <a href=/visualizarAct/{{alb.0}}  class="btn" >Actualizar</a>
-                            <a href=/metodo/{{alb.0}}  class="btn" >Metodo de pago</a>
-                            <a href=/confirmacion/{{alb.0}} class="btnD">Eliminar</button>
+                            <a href=/confirmacion/{{alb.0}} class="btnD">Eliminar</a> 
                         </td>
+                        <td> <a href=/metodo/{{alb.0}}  class="btn" >Metodo de pago</a> </td>
                     </tr>
                     {% endfor %}
                     {% else %}
@@ -65,6 +64,9 @@
                     {% endif %}
                 </tbody>
         </table>
+
+        <a href="/main" class="btn">Regresar al menú principal</a>
+
     </form>
     </div>
 </body>
