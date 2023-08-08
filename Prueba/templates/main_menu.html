@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleRegistro.css') }}">
     <title>Menu Principal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleRegistro.css') }}">
+    
 </head>
 <body>
     {%with mensajes= get_flashed_messages()%}
@@ -17,30 +18,32 @@
     <div class="form-main">
         <div class="form-conte">
             <div class="box">
-        <h3>Menú Principal del Administrador</h3>
-        
-        <form action="{{ url_for('buscarm') }}" method="GET">
-            <button type="submit" class="btn iniciar-sesion-btn">Consutar Menú</button>
-        </form>                     
-        <form action="{{ url_for('nuevo') }}" method="GET">
-            <button type="submit" class="btn iniciar-sesion-btn">Nuevo Producto</button>
-        </form>
-        <form action="{{ url_for('buscarI') }}" method="GET">
-            <button type="submit" class="btn iniciar-sesion-btn">Ingredientes</button>
-        </form>
-        <form action="{{ url_for('buscar') }}" method="GET">
-            <button type="submit" class="btn iniciar-sesion-btn">Buscar Pedidos</button>
-        </form>
+                <h3>Menú Principal del Administrador</h3>
+                
+                <form action="{{ url_for('buscarm') }}" method="GET">
+                    <button type="submit" class="btn iniciar-sesion-btn">Consutar Menú</button>
+                </form>     
+                <form action="{{ url_for('vista_prev') }}" method="GET">
+                    <button type="submit" class="btn iniciar-sesion-btn">Vista previa</button>
+                </form>                 
+                <form action="{{ url_for('nuevo') }}" method="GET">
+                    <button type="submit" class="btn iniciar-sesion-btn">Nuevo Producto</button>
+                </form>
 
-        <form action="{{ url_for('buscaru') }}" method="GET">
-            <button type="submit" class="btn iniciar-sesion-btn">Consultar Usuarios</button>
-        </form>
+                <form action="{{ url_for('buscar') }}" method="GET">
+                    <button type="submit" class="btn iniciar-sesion-btn">Buscar Pedidos</button>
+                </form>
 
-        <form action="{{ url_for('registroa') }}" method="GET">
-            <button type="submit" class="btn iniciar-sesion-btn">Nuevo Administrador</button>
-        </form>
+                <form action="{{ url_for('buscaru') }}" method="GET">
+                    <button type="submit" class="btn iniciar-sesion-btn">Consultar Usuarios</button>
+                </form>
+
+                <form action="{{ url_for('registroa') }}" method="GET">
+                    <button type="submit" class="btn iniciar-sesion-btn">Nuevo Administrador</button>
+                </form>
+                <form action="{{ url_for('cerrar') }}" method="GET">
+                    <button type="submit" class="btn iniciar-sesion-btn">Cerrar Sesión</button>
+                </form>
             </div>
         </div>
-    </div>      
-</body>
-</html>
+    </div> 

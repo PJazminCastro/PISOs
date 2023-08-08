@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar usuario</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleBuscar.css') }}">
+</head>
+<body>
+    {%with mensajes= get_flashed_messages()%}
+        {% if mensajes%}
+            {%for msj in mensajes%}
+                <h3> {{ msj }} </h3>
+            {%endfor%}
+        {% endif %}
+    {%endwith%}
+    <div class="form-main">
+    <form action="{{ url_for('mc')}}" method="POST">
+        
+        <table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Matricula</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Correo</th>
+                        <th>Rol</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if listaUsuario %}
+                    {% for alb in listaUsuario %} 
+                    <tr>
+                        <td> {{ alb.0 }} </td>
+                        <td> {{ alb.1 }} </td>
+                        <td> {{ alb.2 }} </td>
+                        <td> {{ alb.3 }} </td>
+                        {%if alb.5 == 2 %}
+                        <td> Usuario </td>
+                        {% else %}
+                        <td> Administrador </td>
+                        {% endif %}
+                   
+                        <td> 
+                            <a href=/visualizarAct/{{alb.0}}  class="btn" >Actualizar</a>
+                            <a href=/metodo/{{alb.0}}  class="btn" >Metodo de pago</a>
+                            <a href=/confirmacion/{{alb.0}} class="btnD">Eliminar</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="5">No se encontraron resultados</td>
+                      </tr>
+                    {% endif %}
+                </tbody>
+        </table>
+
+       
+
+    </form>
+    
+    </div>
+    <a href="/main" class="btn">Regresar al menú principal</a>
+</body>
+</html>
