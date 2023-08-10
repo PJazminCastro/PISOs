@@ -6,6 +6,7 @@ from flask_login import UserMixin
 import os
 from werkzeug.utils import secure_filename
 from functools import wraps
+from datetime import datetime
 
 #INFORMACION PARA CONECTARSE A UNA BASE DE DATOS
 server = 'localhost' #nombre del servidor
@@ -22,51 +23,9 @@ except:
 
 #CONSULTA A LA BD
 
-cursor = conexion.cursor()
-#cursor.execute("select * from entregas;")
-
-#entrega = cursor.fetchone() #trae uno por uno de los datos
-#while entrega:
-#    print(entrega)
-#    entrega = cursor.fetchone()
-
-#entregas = cursor.fetchall()
-#for entrega in entregas:
-#    print (entrega)
-
-cursor.close()
-
-#INSERTAR DATOS A LA BD
-#cursorInsert = conexion.cursor()
-
-#Vnombre = "Prueba"
-#insert = "insert into estados(nombre) values (?);"
-#cursorInsert.execute(insert, Vnombre)
-
-#cursorInsert.commit()
-#cursorInsert.close()
-
-#ACTUALIZAR DATOS DE LA BD
-#cursorUpd = conexion.cursor()
-#VUnombre = "PruebaUpd"
-#VUid = "16"
-#update = "update estados set nombre = ? where id = ?"
-#cursorUpd.execute(update, VUnombre, VUid)
-
-#cursorUpd.commit()
-#cursorUpd.close()
-
-#ELIMINAR DATOS DE LA BD
-#cursorDlt = conexion.cursor()
-#VDid = 16
-#delete = "delete from estados where id = ?"
-#cursorDlt.execute(delete, VDid)
-
-#cursorDlt.commit()
-#cursorDlt.close()
-
 #HTML
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'Proyecto integrador/static/img'
 app.secret_key = 'mysecretkey'
 
 @app.route('/')
@@ -77,15 +36,20 @@ def index():
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
-        VMat = request.form['txtMat']
         VNom = request.form['txtNom']
         VAp = request.form['txtAp']
         VAm = request.form['txtAm']
         VCorr = request.form['txtCorr']
+        VTel = request.form['txtTel']
+        VMat = request.form['txtMat']
         VPass = request.form['txtPass']
+        Vfecha = datetime.now()  # Agrega los paréntesis aquí para llamar a la función
+
         cursorReg = conexion.cursor()
-        cursorReg.execute('INSERT INTO usuarios (Matricula,Nombre, Ap, Am, Correo, Contraseña, Rol) VALUES (?,?,?,?,?,?,2)', (VMat, VNom, VAp, VAm, VCorr, VPass))
-        cursorReg.commit()
+        cursorReg.execute('INSERT INTO personas (nombre, ap, am, telefono, matricula, correo,  contraseña, fechaalta, rol) VALUES (?,?,?,?,?,?,?,?,2)', (VNom, VAp, VAm, VTel, VMat, VCorr, VPass, Vfecha))
+
+        conexion.commit()  # Realiza el commit en la conexión, no en los cursores
+
         flash('Usuario agregado correctamente')
         return redirect(url_for('index'))
     return render_template('registro_usuarios.html')
@@ -100,10 +64,10 @@ def login():
         Vmatricula = request.form['matricula']
         Vcontrasena = request.form['contrasena']
         #VERIFICACION DE CREDENCIALES
-        verificacion = "select * from Usuarios where matricula = ? and contraseña = ?"
-        cursorLog.execute(verificacion, Vmatricula, Vcontrasena)
+        verificacion = "select * from personas where matricula = ? and contraseña = ?"
+        cursorLog.execute(verificacion, (Vmatricula, Vcontrasena))
         resultado = cursorLog.fetchone()
-        rol = "select rol from Usuarios where matricula = ? and contraseña = ?"
+        rol = "select rol from personas where matricula = ? and contraseña = ?"
         #VALIDAR CREDENCIALES
         if resultado is not None:
             cursorLog.execute(rol, (Vmatricula, Vcontrasena))
@@ -128,29 +92,50 @@ def main():
 def cliente():
     return render_template('mm_cl.html')
 
-@app.route('/menu', methods=['GET'])
+@app.route('/menu', methods=['GET', 'POST'])
 
 def menu():
     if request.method == 'POST':
-        nombre_producto = request.form['nombre_producto']
-        precio_producto = request.form['precio_producto']
-        agregar_producto(nombre_producto, precio_producto)
+        if 'agregarProd' in request.form:
+            producto = request.form['agregarProd']
+            idpersona = session.get('Matricula')
+            idplatillo = obtener_id_del_platillo(producto)
+            identrega = 6
+            idpago = 2
+            fecha = datetime.now()
+            cantidad = int(request.form.get('cantidad_' + producto, 1)) 
+            idcafeteria = 1
+            
+            agregar_pedido(idpersona, idplatillo, identrega, idpago, fecha, cantidad, idcafeteria)
+
     productos = obtener_productos()
+    
     return render_template('menu.html', productos=productos)
+
+def agregar_pedido(idpersona, idplatillo, identrega, idpago, fecha, cantidad, idcafeteria):
+    cursor = conexion.cursor()
+    cursor.execute('INSERT INTO pedidos (idpersona, idplatillo, identrega, idpago, fecha, cantidad, idcafeteria) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                   (idpersona, idplatillo, identrega, idpago, fecha, cantidad, idcafeteria))
+    conexion.commit()  
+    cursor.close()
 
 def obtener_productos():
     cursor = conexion.cursor()
-    cursor.execute('SELECT * FROM Menu')
+    cursor.execute('SELECT * FROM platillos where estatus = "Disponible')
     productos = cursor.fetchall()
     cursor.close()
-
     return productos
 
-def agregar_producto(nombre, precio):
+def obtener_id_del_platillo(nombre_platillo):
     cursor = conexion.cursor()
-    cursor.execute('INSERT INTO Menu (producto, precio) VALUES (%s, %s)', (nombre, precio))
-    cursor.commit()
+    cursor.execute('SELECT id FROM platillos WHERE nombreP = ?', (nombre_platillo,))
+    resultado = cursor.fetchone()
     cursor.close()
+
+    if resultado:
+        return resultado[0]
+    else:
+        return None  
 
 #BUSCAR PEDIDOS
 @app.route('/buscar', methods=['POST', 'GET'])
@@ -161,10 +146,10 @@ def buscar():
         
         cursorBU = conexion.cursor()
         if not VBusc:
-            cursorBU.execute('SELECT tickets.ID, tickets.folio_ticket, tickets.idcliente, platillos.nombreP, tickets.cantidad FROM tickets  INNER JOIN platillos ON tickets.idplatillo = platillos.ID')
+            cursorBU.execute('select pedidos.id, personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, cantidad, sum(pedidos.cantidad *  platillos.costo) from pedidos inner join personas on pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id inner join entregas on pedidos.identrega = entregas.id inner join metoPago on pedidos.idpago = metoPago.id  group by personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, pedidos.cantidad, pedidos.id')
 
         else:
-            cursorBU.execute('SELECT tickets.ID, tickets.folio_ticket, personas.nombre, platillos.nombreP, tickets.cantidad, sum(tickets.cantidad *  platillos.costo) FROM tickets  INNER JOIN platillos ON tickets.idplatillo = platillos.ID INNER JOIN clientes on tickets.idcliente = clientes.id INNER JOIN personas on clientes.idpersona = personas.id  WHERE folio_ticket = ? group by tickets.id, Tickets.folio_ticket, personas.nombre, platillos.nombreP, Tickets.cantidad', (VBusc,))
+            cursorBU.execute('select pedidos.id, personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, cantidad, sum(pedidos.cantidad *  platillos.costo) from pedidos inner join personas on pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id inner join entregas on pedidos.identrega = entregas.id inner join metoPago on pedidos.idpago = metoPago.id WHERE pedidos.id = ? group by personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, pedidos.cantidad, pedidos.id', (VBusc,))
         consBP = cursorBU.fetchall()
         
         if consBP is not None:
@@ -173,7 +158,7 @@ def buscar():
             mensaje = 'No se encontraron resultados.'
             return render_template('buscar_pedido.html', mensaje=mensaje)
     cursorBU = conexion.cursor()
-    cursorBU.execute('SELECT tickets.ID, tickets.folio_ticket, personas.nombre, platillos.nombreP, tickets.cantidad, sum(tickets.cantidad *  platillos.costo) FROM tickets  INNER JOIN platillos ON tickets.idplatillo = platillos.ID INNER JOIN clientes on tickets.idcliente = clientes.id INNER JOIN personas on clientes.idpersona = personas.id group by tickets.id, Tickets.folio_ticket, personas.nombre, platillos.nombreP, Tickets.cantidad')
+    cursorBU.execute('select pedidos.id, personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, cantidad, sum(pedidos.cantidad *  platillos.costo) from pedidos inner join personas on pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id inner join entregas on pedidos.identrega = entregas.id inner join metoPago on pedidos.idpago = metoPago.id  group by personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, pedidos.cantidad, pedidos.id')
     consBU = cursorBU.fetchall()
     return render_template('buscar_pedido.html', listaPedido=consBU)
 
@@ -181,7 +166,7 @@ def buscar():
 @app.route('/visualizarAct/<string:id>')
 def visualizar(id):
     cursorVis = conexion.cursor()
-    cursorVis.execute('select * from usuarios where Matricula = ?', id)
+    cursorVis.execute('select * from personas where Matricula = ?', id)
     visualisarDatos = cursorVis.fetchone()
     return render_template('actualizar_usuario.html', UpdUsuario = visualisarDatos)
 
@@ -190,13 +175,17 @@ def visualizar(id):
 
 def actualizar(id):
     if request.method == 'POST':
-        varNombre = request.form['txtNombre']
-        varAp = request.form['txtAp']
-        varAm = request.form['txtAm']
-        varCorreo = request.form['txtCorreo']
-        varContraseña = request.form['txtContraseña']
+        VNom = request.form['txtNom']
+        VAp = request.form['txtAp']
+        VAm = request.form['txtAm']
+        VCorr = request.form['txtCorr']
+        VTel = request.form['txtTel']
+        VMat = request.form['txtMat']
+        VPass = request.form['txtPass']
+        Vfecha = datetime.now()  # Agrega los paréntesis aquí para llamar a la función
+
         cursorUpd = conexion.cursor()
-        cursorUpd.execute('update usuarios set Nombre = ?, Ap = ?, Am = ?, Correo = ?, Contraseña = ? where Matricula = ?', ( varNombre, varAp, varAm, varCorreo, varContraseña, id))
+        cursorUpd.execute('update personas set nombre=?, ap=?, am=?, telefono=?, matricula=?, correo=?,  contraseña=?, fechaalta=?, rol=2)', (VNom, VAp, VAm, VTel, VMat, VCorr, VPass, Vfecha))
         cursorUpd.commit()
     flash ('El usuario con Matricula' + id +  'se actualizo correctamente.')
     return redirect(url_for('buscaru'))
@@ -206,7 +195,7 @@ def actualizar(id):
 
 def eliminar(id):
     cursorConfi = conexion.cursor()
-    cursorConfi.execute('select * from usuarios where Matricula = ?', id)
+    cursorConfi.execute('select * from personas where Matricula = ?', id)
     consuUsuario = cursorConfi.fetchone()
     return render_template('borrar_usuarios.html', usuario=consuUsuario)
 
@@ -235,9 +224,9 @@ def buscaru():
         
         cursorBU = conexion.cursor()
         if not VBusc:
-            cursorBU.execute('SELECT * FROM usuarios')
+            cursorBU.execute('SELECT * FROM personas')
         else:
-            cursorBU.execute('SELECT * FROM usuarios WHERE Matricula = ?', (VBusc,))
+            cursorBU.execute('SELECT * FROM personas WHERE Matricula = ?', (VBusc,))
         consBU = cursorBU.fetchall()
         
         if consBU is not None:
@@ -247,7 +236,7 @@ def buscaru():
             return render_template('buscar_Usuario.html', mensaje=mensaje)
     
     cursorBU = conexion.cursor()
-    cursorBU.execute('SELECT * FROM usuarios')
+    cursorBU.execute('SELECT * FROM personas where rol = 2')
     consBU = cursorBU.fetchall()
     return render_template('buscar_Usuario.html', listaUsuario=consBU)
 
@@ -286,11 +275,12 @@ def nuevo():
         VProd = request.form['txtProd']
         VPrec = request.form['txtPrec']
         imagen_producto = request.files['imagen_producto']
+        Vestatus = 'Disponible'
         if imagen_producto and allowed_file(imagen_producto.filename):
             nombre_archivo = secure_filename(VProd) + '.jpg'
             imagen_producto.save(os.path.join(app.config['UPLOAD_FOLDER'], nombre_archivo))
             CS = conexion.cursor()
-            CS.execute('INSERT INTO menu (Producto, precio) VALUES (%s,%s)', (VProd, VPrec))
+            CS.execute('INSERT INTO platillos (nombreP, costo, estatus) VALUES (?,?,?)', (VProd, VPrec, Vestatus))
             CS.commit()
             flash(f'El producto {VProd} se ha registrado correctamente', 'success')
             return redirect(url_for('vista_prev'))
@@ -383,10 +373,10 @@ def eliminarm(id):
 @app.route("/eliminarm/<id>", methods=['POST'])
 def eliminarBDm(id):
     cursorDlt = conexion.cursor()
-    cursorDlt.execute('delete from ticket where idplatillo = ?', (id,))
+    cursorDlt.execute('delete from pedidos where idplatillo = ?', (id,))
     cursorDlt.commit()
     cursorDlt = conexion.cursor()
-    cursorDlt.execute('delete from platillo where ID = ?', (id,))
+    cursorDlt.execute('delete from platillos where ID = ?', (id,))
     cursorDlt.commit()
     flash('Se elimino el producto')
     return redirect(url_for('buscarm'))
@@ -395,16 +385,19 @@ def eliminarBDm(id):
 @app.route('/registroa', methods=['GET', 'POST'])
 def registroa():
     if request.method == 'POST':
-        VMat = request.form['txtMat']
         VNom = request.form['txtNom']
         VAp = request.form['txtAp']
         VAm = request.form['txtAm']
         VCorr = request.form['txtCorr']
+        VTel = request.form['txtTel']
+        VMat = request.form['txtMat']
         VPass = request.form['txtPass']
-        
-        CS = conexion.cursor()
-        CS.execute('INSERT INTO usuarioS (Matricula,Nombre, Ap, am, Correo, Contraseña, Rol) VALUES (?,?,?,?,?,?,1)', (VMat, VNom, VAp, VAm, VCorr, VPass))
-        CS.commit()
+        Vfecha = datetime.now()  # Agrega los paréntesis aquí para llamar a la función
+
+        cursorReg = conexion.cursor()
+        cursorReg.execute('INSERT INTO personas (nombre, ap, am, telefono, matricula, correo,  contraseña, fechaalta, rol) VALUES (?,?,?,?,?,?,?,?,1)', (VNom, VAp, VAm, VTel, VMat, VCorr, VPass, Vfecha))
+
+        conexion.commit()
         flash('Administrador agregado correctamente')
         return redirect(url_for('main'))
     return render_template('registro_Admin.html')

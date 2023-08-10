@@ -31,30 +31,24 @@
                         <th>Nombre</th>
                         <th>Apellido paterno</th>
                         <th>Correo</th>
-                        <th>Rol</th>
+                        <th>Telefono</th>
                         <th>Acciones</th>
-                        <th>Metodo de pago</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% if listaUsuario %}
                     {% for alb in listaUsuario %} 
                     <tr>
-                        <td> {{ alb.0 }} </td>
+                        <td> {{ alb.5 }} </td>
                         <td> {{ alb.1 }} </td>
                         <td> {{ alb.2 }} </td>
+                        <td> {{ alb.6 }} </td>
                         <td> {{ alb.4 }} </td>
-                        {%if alb.6 == 2 %}
-                        <td> Usuario </td>
-                        {% else %}
-                        <td> Administrador </td>
-                        {% endif %}
                    
                         <td> 
                             <a href=/visualizarAct/{{alb.0}}  class="btn" >Actualizar</a>
                             <a href=/confirmacion/{{alb.0}} class="btnD">Eliminar</a> 
                         </td>
-                        <td> <a href=/metodo/{{alb.0}}  class="btn" >Metodo de pago</a> </td>
                     </tr>
                     {% endfor %}
                     {% else %}
