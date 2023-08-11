@@ -93,49 +93,53 @@ def cliente():
     return render_template('mm_cl.html')
 
 @app.route('/menu', methods=['GET', 'POST'])
-
 def menu():
-    if request.method == 'POST':
-        if 'agregarProd' in request.form:
-            producto = request.form['agregarProd']
-            idpersona = session.get('Matricula')
-            idplatillo = obtener_id_del_platillo(producto)
-            identrega = 6
-            idpago = 2
-            fecha = datetime.now()
-            cantidad = int(request.form.get('cantidad_' + producto, 1)) 
-            idcafeteria = 1
-            
-            agregar_pedido(idpersona, idplatillo, identrega, idpago, fecha, cantidad, idcafeteria)
-
     productos = obtener_productos()
-    
-    return render_template('menu.html', productos=productos)
-
-def agregar_pedido(idpersona, idplatillo, identrega, idpago, fecha, cantidad, idcafeteria):
-    cursor = conexion.cursor()
-    cursor.execute('INSERT INTO pedidos (idpersona, idplatillo, identrega, idpago, fecha, cantidad, idcafeteria) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                   (idpersona, idplatillo, identrega, idpago, fecha, cantidad, idcafeteria))
-    conexion.commit()  
-    cursor.close()
+    ultimo_folio = obtener_ultimo_folio()
+    user_id = session.get('Matricula')
+    cursorBU = conexion.cursor()
+    cursorBU.execute('SELECT pedidos.ID,  personas.nombre, platillos.nombreP, pedidos.cantidad, sum(platillos.costo * pedidos.cantidad) FROM pedidos INNER JOIN platillos ON pedidos.idplatillo = platillos.id inner join personas on pedidos.idpersona = personas.id where pedidos.idpersona = ? and pedidos.id = ? group by pedidos.ID,  personas.nombre, platillos.nombreP, pedidos.cantidad',(user_id, ultimo_folio))
+    consBU = cursorBU.fetchall()
+    flash("Su orden es la numero " + str(ultimo_folio) + ", Favor de pagar en caja") 
+    return render_template('menu.html', productos=productos, listaPedido=consBU)    
 
 def obtener_productos():
     cursor = conexion.cursor()
-    cursor.execute('SELECT * FROM platillos where estatus = "Disponible')
+    cursor.execute('SELECT * FROM platillos')
     productos = cursor.fetchall()
     cursor.close()
     return productos
 
-def obtener_id_del_platillo(nombre_platillo):
+def agregar_producto(nombre, precio):
     cursor = conexion.cursor()
-    cursor.execute('SELECT id FROM platillos WHERE nombreP = ?', (nombre_platillo,))
-    resultado = cursor.fetchone()
+    cursor.execute('INSERT INTO platillos (nombreP, costo) VALUES (?, ?)', (nombre, precio))
+    cursor.commit()
     cursor.close()
 
-    if resultado:
-        return resultado[0]
+@app.route('/orden', methods=['GET', 'POST'])
+def orden():
+    productos = obtener_productos()
+    nuevo_folio = obtener_ultimo_folio()
+    user_id = session.get('Matricula')
+    cursorBU = conexion.cursor()
+    cursorBU.execute('SELECT pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.precio) FROM pedidos INNER JOIN platillos ON pedidos.idplatillo = platillos.id where pedidos.idpersona = ? and pedidos.id = ? group by pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad',(user_id, nuevo_folio))
+    consBU = cursorBU.fetchall()
+    if not consBU:
+        flash('No se realizó ninguna orden, por favor ordene algun producto.')
+        return redirect(url_for('menu'))
     else:
-        return None  
+        CS = conexion.cursor()
+        CS.execute('INSERT INTO orden (x) VALUES (1)')
+        conexion.commit()
+        return render_template('orden.html', productos=productos, listaPedido=consBU, nuevo_folio=nuevo_folio)
+    
+
+def obtener_ultimo_folio():
+    cursor = conexion.cursor()
+    cursor.execute('SELECT MAX(ID) FROM orden')
+    ultimo_folio = cursor.fetchone()[0]
+    cursor.close()
+    return ultimo_folio or 1
 
 #BUSCAR PEDIDOS
 @app.route('/buscar', methods=['POST', 'GET'])
@@ -458,13 +462,25 @@ def mc():
     consBU = cursorBU.fetchall()
     return render_template('mc.html', listaUsuario=consBU)
 
-@app.route('/conf/<id>')
-
+@app.route('/conf/<id>', methods=['GET', 'POST'])
 def conf(id):
     curEditar = conexion.cursor()
-    curEditar.execute('SELECT * FROM pedidos WHERE producto = ?', (id,))
+    curEditar.execute('SELECT * FROM platillos WHERE nombreP = ?', (id,))
     producto_principal = curEditar.fetchone()
 
+    if request.method == 'POST':
+        Vcant = request.form['cantidad']
+        user_id = session.get('Matricula')
+        cursorBU = conexion.cursor()
+        Vestatus = 6
+        Vpago = 2
+        fecha = datetime.now
+        Vcafe = 1
+        
+        cursorBU.execute('INSERT INTO pedidos(idpersona, idplatillo, identrega, idpago, fecha, cantidad, idcafeteria) VALUES (?,?,?,?,?,?,?)', (user_id, id, Vestatus, Vpago, fecha, Vcant, Vcafe))
+        conexion.commit()  # Commit the changes to the database
+        cursorBU.close()
+        return redirect(url_for('menu'))
     return render_template('compra.html', producto_principal=producto_principal)
 
 

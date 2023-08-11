@@ -7,171 +7,72 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styleMenu.css') }}">
 </head>
 <body>
+    
     <h1>Menu</h1>
-    <form action="/menu" method="post">
-        <div class="wrap column-4 columns">
+    <div class="wrap column-4 columns">
+        {% for producto in productos %}
+        <div class="tarjeta-caf" style="background: url('{{ url_for('static', filename='img/'+producto[0]+'.jpg') }}') center; background-size: cover;">
 
-            <div class="tarjeta-caf" style="background: url('{{ url_for('static', filename='img/latte.jpg') }}') center; background-size: cover;">
 
-                <div class="wrap-text_tarjeta-caf">
-                    <h3>Latte</h3>
-                    <div class="cta-wrap_tarjeta-caf">
-                        <div class="precio_tarjeta-caf">
-                            <span>$25</span>
-                        </div>
-                        <div class="cta_tarjeta-caf">
-                            <input type="number" name="cantidad_{{ producto }}" value="1" min="1">
-                            <button type="submit" class="btn" name="agregarProd" value="{{ producto }}">Agregar</button>
-                        </div>
+            <div class="wrap-text_tarjeta-caf">
+                <h3>{{ producto[0] }}</h3>
+                <div class="cta-wrap_tarjeta-caf">
+                    <div class="precio_tarjeta-caf">
+                        <span>${{ producto[1] }}</span>
+                    </div>
+                    <div class="cta_tarjeta-caf">
+                        <a href="/conf/{{ producto[0] }}"  class="btn" >Agregar</a>
+                        
                     </div>
                 </div>
             </div>
-
-            <div class="tarjeta-caf" style="background: url('{{ url_for('static', filename='img/pay.jpg') }}') center; background-size: cover;">
-
-                <div class="wrap-text_tarjeta-caf">
-                    <h3>Pay</h3>
-                    <div class="cta-wrap_tarjeta-caf">
-                        <div class="precio_tarjeta-caf">
-                            <span>$25</span>
-                        </div>
-                        <div class="cta_tarjeta-caf">
-                            <input type="number" name="cantidad_{{ producto }}" value="1" min="1">
-                            <button type="submit" class="btn" name="agregarProd" value="{{ producto }}">Agregar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tarjeta-caf" style="background: url('{{ url_for('static', filename='img/cheesecake.jpg') }}') center; background-size: cover;">
-
-                <div class="wrap-text_tarjeta-caf">
-                    <h3>Cheesecake</h3>
-                    <div class="cta-wrap_tarjeta-caf">
-                        <div class="precio_tarjeta-caf">
-                            <span>$25</span>
-                        </div>
-                        <div class="cta_tarjeta-caf">
-                            <input type="number" name="cantidad_{{ producto }}" value="1" min="1">
-                            <button type="submit" class="btn" name="agregarProd" value="{{ producto }}">Agregar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tarjeta-caf" style="background: url('{{ url_for('static', filename='img/matcha.jpg') }}') center; background-size: cover;">
-
-                <div class="wrap-text_tarjeta-caf">
-                    <h3>Matcha</h3>
-                    <div class="cta-wrap_tarjeta-caf">
-                        <div class="precio_tarjeta-caf">
-                            <span>$30</span>
-                        </div>
-                        <div class="cta_tarjeta-caf">
-                            <input type="number" name="cantidad_{{ producto }}" value="1" min="1">
-                            <button type="submit" class="btn" name="agregarProd" value="{{ producto }}">Agregar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tarjeta-caf" style="background: url('{{ url_for('static', filename='img/espresso.jpg') }}') center; background-size: cover;">
-
-                <div class="wrap-text_tarjeta-caf">
-                    <h3>Espresso</h3>
-                    <div class="cta-wrap_tarjeta-caf">
-                        <div class="precio_tarjeta-caf">
-                            <span>$30</span>
-                        </div>
-                        <div class="cta_tarjeta-caf">
-                            <input type="number" name="cantidad_{{ producto }}" value="1" min="1">
-                            <button type="submit" class="btn" name="agregarProd" value="{{ producto }}">Agregar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tarjeta-caf" style="background: url('{{ url_for('static', filename='img/hotdog.jpg') }}') center; background-size: cover;">
-
-                <div class="wrap-text_tarjeta-caf">
-                    <h3>Hot dog</h3>
-                    <div class="cta-wrap_tarjeta-caf">
-                        <div class="precio_tarjeta-caf">
-                            <span>$30</span>
-                        </div>
-                        <div class="cta_tarjeta-caf">
-                            <input type="number" name="cantidad_{{ producto }}" value="1" min="1">
-                            <button type="submit" class="btn" name="agregarProd" value="{{ producto }}">Agregar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tarjeta-caf" style="background: url('{{ url_for('static', filename='img/frappe.jpg') }}') center; background-size: cover;">
-
-                <div class="wrap-text_tarjeta-caf">
-                    <h3>Frappe</h3>
-                    <div class="cta-wrap_tarjeta-caf">
-                        <div class="precio_tarjeta-caf">
-                            <span>$50</span>
-                        </div>
-                        <div class="cta_tarjeta-caf">
-                            <input type="number" name="cantidad_{{ producto }}" value="1" min="1">
-                            <button type="submit" class="btn" name="agregarProd" value="{{ producto }}">Agregar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tarjeta-caf" style="background: url('{{ url_for('static', filename='img/hamburguesa.jpg') }}') center; background-size: cover;">
-
-                <div class="wrap-text_tarjeta-caf">
-                    <h3>Hamburguesa</h3>
-                    <div class="cta-wrap_tarjeta-caf">
-                        <div class="precio_tarjeta-caf">
-                            <span>$50</span>
-                        </div>
-                        <div class="cta_tarjeta-caf">
-                            <input type="number" name="cantidad_{{ producto }}" value="1" min="1">
-                            <button type="submit" class="btn" name="agregarProd" value="{{ producto }}">Agregar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tarjeta-caf" style="background: url('{{ url_for('static', filename='img/sandwitch.jpg') }}') center; background-size: cover;">
-
-                <div class="wrap-text_tarjeta-caf">
-                    <h3>Sandwitch</h3>
-                    <div class="cta-wrap_tarjeta-caf">
-                        <div class="precio_tarjeta-caf">
-                            <span>$50</span>
-                        </div>
-                        <div class="cta_tarjeta-caf">
-                            <input type="number" name="cantidad_{{ producto }}" value="1" min="1">
-                            <button type="submit" class="btn" name="agregarProd" value="{{ producto }}">Agregar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tarjeta-caf" style="background: url('{{ url_for('static', filename='img/pizza.png') }}') center; background-size: cover;">
-
-                <div class="wrap-text_tarjeta-caf">
-                    <h3>Pizza</h3>
-                    <div class="cta-wrap_tarjeta-caf">
-                        <div class="precio_tarjeta-caf">
-                            <span>$120</span>
-                        </div>
-                        <div class="cta_tarjeta-caf">
-                            <input type="number" name="cantidad_{{ producto }}" value="1" min="1">
-                            <button type="submit" class="btn" name="agregarProd" value="{{ producto }}">Agregar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
-    </form>
+        {% endfor %}
+    </div>
+        <div class="tabla-container">
+            <center><h1>Mi Pedido</h1></center>
+        <table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Folio</th>
+                        <th>Cliente</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if listaPedido %}
+                    {% for alb in listaPedido %} 
+                    <tr>
+                        <td> {{ alb.1 }} </td>
+                        <td> {{ alb.2 }} </td>
+                        <td> {{ alb.3 }} </td>
+                        <td> {{ alb.4 }} </td>
+                        <td> {{ alb.5 }} </td>
+                        <td>
+                            <a href=/confirmacionp/{{alb.0}} class="btnD">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="5">No se ha agregado ningun producto</td>
+                      </tr>
+                    {% endif %}
+                    </tbody>
+            </table>
+            
+    </div>
+
+    
+    <center>
+        <form action="/orden">
+            <button type="submit" class="btn" name="realizar_pedido">Realizar Pedido</button>
+        </form>
+        <a href="/cliente" class="btn">Regresar al menú principal</a>
+    </center>
 </body>
 </html>
