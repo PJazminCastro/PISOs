@@ -108,7 +108,7 @@ def menu():
     ultimo_folio = obtener_ultimo_folio()
     user_id = session.get('Matricula')
     cursorBU = conexion.cursor()
-    cursorBU.execute('SELECT pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad * platillos.costo) FROM ticket t INNER JOIN personas on pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id where pedidos.idpersona = ? and pedidos.id = ? group by pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad',(user_id, ultimo_folio))
+    cursorBU.execute('SELECT pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad * platillos.costo) FROM ticket t INNER JOIN personas on pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id where pedidos.idpersona = ? and pedidos.id = ? group by pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo',(user_id, ultimo_folio))
     consBU = cursorBU.fetchall()
     flash("Su orden es la numero " + str(ultimo_folio) + ", Favor de pagar en caja") 
     return render_template('menu.html', productos=productos, listaPedido=consBU)
@@ -134,7 +134,7 @@ def orden():
     nuevo_folio = obtener_ultimo_folio()
     user_id = session.get('Matricula')
     cursorBU = conexion.cursor()
-    cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas ON personas.id = pedidos.idpersona inner join platillos on pedidos.idplatillo = pedidos.id where pedidos.idpersona = ? and pedidos.id = ? group by pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad',(user_id, nuevo_folio))
+    cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas ON personas.id = pedidos.idpersona inner join platillos on pedidos.idplatillo = pedidos.id where pedidos.idpersona = ? and pedidos.id = ? group by pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo',(user_id, nuevo_folio))
     consBU = cursorBU.fetchall()
     if not consBU:
         flash('No se realizó ninguna orden, por favor ordene algun producto.')
@@ -161,10 +161,10 @@ def buscar():
         
         cursorBU = conexion.cursor()
         if not VBusc:
-            cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas on pedidos.idpersona  = personas.id inner join platillos on perdidos.idplatillo = platillos.id group by pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad')
+            cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas on pedidos.idpersona  = personas.id inner join platillos on perdidos.idplatillo = platillos.id group by pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo')
 
         else:
-            cursorBU.execute('SELECT t.ID, t.folio_ticket, t.id_cliente, m.Producto, t.cantidad, sum(t.cantidad *  m.precio) FROM ticket t INNER JOIN Menu m ON t.id_producto = m.ID WHERE folio_ticket = %s group by t.ID, t.folio_ticket, t.id_cliente, m.Producto, t.cantidad', (VBusc,))
+            cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas ON pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillos = platillos.id WHERE pedidos.id = ? group by pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo', (VBusc,))
         consBP = cursorBU.fetchall()
         
         if consBP is not None:
@@ -172,8 +172,8 @@ def buscar():
         else:
             mensaje = 'No se encontraron resultados.'
             return render_template('buscar_pedido.html', mensaje=mensaje)
-    cursorBU = mysql.connection.cursor()
-    cursorBU.execute('SELECT t.ID, t.folio_ticket, t.id_cliente, m.Producto, t.cantidad, sum(t.cantidad *  m.precio) FROM ticket t INNER JOIN Menu m ON t.id_producto = m.ID group by t.ID, t.folio_ticket, t.id_cliente, m.Producto, t.cantidad')
+    cursorBU = conexion.cursor()
+    cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas ON pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillos = platillos.id WHERE pedidos.id = ? group by pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo')
     consBU = cursorBU.fetchall()
     return render_template('buscar_pedido.html', listaPedido=consBU)
 
@@ -181,8 +181,8 @@ def buscar():
 @app.route('/visualizarAct/<string:id>')
 @login_required
 def visualizar(id):
-    cursorVis = mysql.connection.cursor()
-    cursorVis.execute('select * from usuario where Matricula = %s', (id,))
+    cursorVis = conexion.cursor()
+    cursorVis.execute('select * from personas where Matricula = ?', (id,))
     visualisarDatos = cursorVis.fetchone()
     return render_template('actualizar_usuario.html', UpdUsuario = visualisarDatos)
 
@@ -191,37 +191,37 @@ def visualizar(id):
 @login_required
 def actualizar(id):
     if request.method == 'POST':
- 
-        varNombre = request.form['txtNombre']
-        varApellidos = request.form['txtApellidos']
-        varCorreo = request.form['txtCorreo']
-        varContraseña = request.form['txtContraseña']
-        cursorUpd = mysql.connection.cursor()
-        cursorUpd.execute('update usuario set Nombre = %s, Apellidos = %s, Correo = %s, Contraseña = %s where Matricula = %s', ( varNombre, varApellidos, varCorreo, varContraseña, id))
-        mysql.connection.commit()
+        VNom = request.form['txtNom']
+        VAp = request.form['txtAp']
+        VAm = request.form['txtAm']
+        VTel = request.form['txtTel']
+        VCorr = request.form['txtCorr']
+        VPass = request.form['txtPass']
+        VFecha = datetime.now()
+        rol = 2
+        cursorUpd = conexion.cursor()
+        cursorUpd.execute('update personas set Nombre = ?, Ap = ?, Am = ?, Telefono = ?,  Correo = ?, Contraseña = ?, fechaalta = ?, rol = ? where Matricula = ?', (VNom, VAp, VAm, VTel, VCorr, VPass, VFecha, rol, id))
+        conexion.commit()
     flash ('El usuario con Matricula' + id +  'se actualizo correctamente.')
     return redirect(url_for('buscaru'))
 
 @app.route("/confirmacion/<id>")
 @login_required
 def eliminar(id):
-    cursorConfi = mysql.connection.cursor()
-    cursorConfi.execute('select * from usuario where Matricula = %s', (id,))
+    cursorConfi = conexion.cursor()
+    cursorConfi.execute('select * from personas where Matricula = ?', (id,))
     consuUsuario = cursorConfi.fetchone()
     return render_template('borrar_usuarios.html', usuario=consuUsuario)
 
 @app.route("/eliminar/<id>", methods=['POST'])
 @login_required
 def eliminarBD(id):
-    cursorDlt = mysql.connection.cursor()
-    cursorDlt.execute('delete from tarjetas where cliente = %s', (id,))
-    mysql.connection.commit()
-    cursorDlt = mysql.connection.cursor()
-    cursorDlt.execute('delete from ticket where id_cliente = %s', (id,))
-    mysql.connection.commit()
-    cursorDlt = mysql.connection.cursor()
-    cursorDlt.execute('delete from usuario where Matricula = %s', (id,))
-    mysql.connection.commit()
+    cursorDlt = conexion.cursor()
+    cursorDlt.execute('delete from pedidos where idpersonas = ?', (id,))
+    conexion.commit()
+    cursorDlt = conexion.cursor()
+    cursorDlt.execute('delete from personas where Matricula = ?', (id,))
+    conexion.commit()
     flash('Se elimino el usuario con Matricula'+ id)
     return redirect(url_for('buscaru'))
 
@@ -231,11 +231,11 @@ def buscaru():
     if request.method == 'POST':
         VBusc = request.form['busc']
         
-        cursorBU = mysql.connection.cursor()
+        cursorBU = conexion.cursor()
         if not VBusc:
-            cursorBU.execute('SELECT * FROM usuario')
+            cursorBU.execute('SELECT * FROM personas')
         else:
-            cursorBU.execute('SELECT * FROM usuario WHERE Matricula = %s', (VBusc,))
+            cursorBU.execute('SELECT * FROM personas WHERE Matricula = ?', (VBusc,))
         consBU = cursorBU.fetchall()
         
         if consBU is not None:
@@ -244,76 +244,27 @@ def buscaru():
             mensaje = 'No se encontraron resultados.'
             return render_template('buscar_Usuario.html', mensaje=mensaje)
     
-    cursorBU = mysql.connection.cursor()
-    cursorBU.execute('SELECT * FROM usuario')
+    cursorBU = conexion.cursor()
+    cursorBU.execute('SELECT * FROM personas')
     consBU = cursorBU.fetchall()
     return render_template('buscar_Usuario.html', listaUsuario=consBU)
-
-
-
-
-@app.route('/metodo/<string:id>')
-@login_required
-def metodo(id):
-    cursorVis = mysql.connection.cursor()
-    cursorVis.execute('select * from usuario where Matricula = %s', (id,))
-    visualisarDatos = cursorVis.fetchone()
-    return render_template('metodo_pago.html', UpdUsuario = visualisarDatos)
-
-
-@app.route('/met/<id>', methods=['GET', 'POST'])
-@login_required
-def met(id):
-    if request.method == 'POST':
-        if request.form['txtMet'] == 'efectivo':
-            flash('Eligio efectivo')
-            return redirect(url_for('main'))
-        
-        elif request.form['txtMet'] == 'tarjeta':
-            VMat = request.form['txtNum']
-            VEnom = request.form['txtNom']
-            VNom = request.form['txtVen']
-            VAp = request.form['txtCVV']
-    
-            
-            CS = mysql.connection.cursor()
-            CS.execute('INSERT INTO tarjetas (cliente, numero, nombre, vencimiento, CVV) VALUES (%s, %s, %s, %s, %s)', (id,VMat, VEnom, VNom, VAp))
-            mysql.connection.commit()
-            flash('Tarjeta agregada correctamente')
-            return redirect(url_for('consultar'))
-            
 
 @app.route('/nuevo', methods=['GET', 'POST'])
 @login_required
 def nuevo():
     if request.method == 'POST':
-        # Obtener el nombre y precio del producto desde el formulario
         nombre_producto = request.form['txtProd']
         precio_producto = request.form['txtPrec']
-
-        # Obtener el archivo de imagen del formulario
         imagen_producto = request.files['imagen_producto']
-
-        # Verificar si se proporcionó una imagen
+        estatus = 'Disponible'
         if imagen_producto and allowed_file(imagen_producto.filename):
-            # Generar un nombre único para el archivo de imagen
             nombre_archivo = nombre_producto + '.jpg'
-            
-
-            # Guardar el archivo en la carpeta "img" dentro de "static"
             imagen_producto.save(os.path.join(app.config['UPLOAD_FOLDER'], nombre_archivo))
-
-            # Guardar el nombre y precio del producto en la base de datos
-            CS = mysql.connection.cursor()
-            CS.execute('INSERT INTO menu (Producto, precio) VALUES (%s,%s)', (nombre_producto, precio_producto))
-            mysql.connection.commit()
-
-            # Mostrar un mensaje flash para indicar que el producto se registró correctamente
+            CS = conexion.cursor()
+            CS.execute('INSERT INTO platillos (nombreP, costo, estatus) VALUES (%s,%s)', (nombre_producto, precio_producto, estatus))
+            conexion.commit()
             flash(f'El producto {nombre_producto} se ha registrado correctamente', 'success')
-
-            # Redireccionar al menú principal o a donde desees después de guardar el producto
             return redirect(url_for('vista_prev'))
-
     return render_template('Nuevo.html')
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
@@ -326,11 +277,11 @@ def buscarm():
     if request.method == 'POST':
         VBusc = request.form['busc']
         
-        cursorBU = mysql.connection.cursor()
+        cursorBU = conexion.cursor()
         if not VBusc:
-            cursorBU.execute('SELECT * FROM menu')
+            cursorBU.execute('SELECT * FROM platillos')
         else:
-            cursorBU.execute('SELECT * FROM menu WHERE producto = %s', (VBusc,))
+            cursorBU.execute('SELECT * FROM platillos WHERE nombreP = ?', (VBusc,))
         consBU = cursorBU.fetchall()
 
         if consBU is not None:
@@ -339,8 +290,8 @@ def buscarm():
             mensaje = 'No se encontraron resultados.'
             return render_template('cons_Menu.html', mensaje=mensaje)
     
-    cursorBU = mysql.connection.cursor()
-    cursorBU.execute('SELECT * FROM menu')
+    cursorBU = conexion.cursor()
+    cursorBU.execute('SELECT * FROM platillos')
     consBU = cursorBU.fetchall()
     return render_template('cons_Menu.html', listaUsuario=consBU)
 
@@ -348,53 +299,32 @@ def buscarm():
 @login_required
 def vista_prev():
     if request.method == 'POST':
-        # Obtener el nombre y precio del producto agregado desde el formulario
         nombre_producto = request.form['nombre_producto']
         precio_producto = request.form['precio_producto']
-
-        # Agregar el producto a la base de datos
         agregar_producto(nombre_producto, precio_producto)
-
-    # Obtener todos los productos de la base de datos
     productos = obtener_productos()
-
-    # Renderizar la plantilla HTML y pasar la lista de productos
     return render_template('vp.html', productos=productos)
 
 def obtener_productos():
-    # Conexión a la base de datos MySQL
-   
-    cursor = mysql.connection.cursor()
-
-    # Obtener todos los productos de la tabla "productos"
-    cursor.execute('SELECT producto, precio FROM Menu')
+    cursor = conexion.cursor()
+    cursor.execute('SELECT nombreP, costo FROM platillos')
     productos = cursor.fetchall()
-
-    # Cerrar la conexión a la base de datos
     cursor.close()
-
     return productos
 
-def agregar_producto(nombre, precio):
-    # Conexión a la base de datos MySQL
-    cursor = mysql.connection.cursor()
-
-    # Insertar el producto en la tabla "productos"
-    cursor.execute('INSERT INTO Menu (producto, precio) VALUES (%s, %s)', (nombre, precio))
-
-    # Guardar los cambios en la base de datos
+def agregar_producto(nombre, precio, estatus):
+    estatus = 'Disponible'
+    cursor = conexion.cursor()
+    cursor.execute('INSERT INTO platillos(nombreP, costo, estatus) VALUES (?,?,?)', (nombre, precio, estatus))
     cursor.commit()
-
-    # Cerrar la conexión a la base de datos
     cursor.close()
-
 
 #VER ACTUALIZACIONES MENU
 @app.route('/visualizarMen/<string:id>')
 @login_required
 def visualizarMen(id):
-    cursorVis = mysql.connection.cursor()
-    cursorVis.execute('SELECT * FROM menu WHERE id = %s', (id, ))
+    cursorVis = conexion.cursor()
+    cursorVis.execute('SELECT * FROM platillos WHERE id = ?', (id, ))
     visualisarDatos = cursorVis.fetchone()
     return render_template('actualizar_menu.html', UpdMenu = visualisarDatos)
 
@@ -405,46 +335,49 @@ def actualizarP(id):
     if request.method == 'POST':
         varPlatillo = request.form['txtPlatillo']
         varPrecio = request.form['txtPrecio']
-        cursorUpd = mysql.connection.cursor()
-        cursorUpd.execute('update menu set producto = %s, precio = %s where id = %s', ( varPlatillo, varPrecio, id))
-        mysql.connection.commit()
+        cursorUpd = conexion.cursor()
+        cursorUpd.execute('update platillos set nombreP = ?, costo = ? where id = ?', ( varPlatillo, varPrecio, id))
+        conexion.commit()
     flash ('El platillo  ' + varPlatillo +  ' se actualizo correctamente.')
     return redirect(url_for('buscarm'))
 
 @app.route("/confirmacionm/<id>")
 @login_required
 def eliminarm(id):
-    cursorConfi = mysql.connection.cursor()
-    cursorConfi.execute('select * from menu where ID = %s', (id,))
+    cursorConfi = conexion.cursor()
+    cursorConfi.execute('select * from platillos where ID = %s', (id,))
     consuUsuario = cursorConfi.fetchone()
     return render_template('borrar_menu.html', menu=consuUsuario)
 
 @app.route("/eliminarm/<id>", methods=['POST'])
 @login_required
 def eliminarBDm(id):
-    cursorDlt = mysql.connection.cursor()
-    cursorDlt.execute('delete from ticket where id_producto = %s', (id,))
-    mysql.connection.commit()
-    cursorDlt = mysql.connection.cursor()
-    cursorDlt.execute('delete from menu where ID = %s', (id,))
-    mysql.connection.commit()
+    cursorDlt = conexion.cursor()
+    cursorDlt.execute('delete from pedidos where idplatillos = ?', (id,))
+    conexion.commit()
+    cursorDlt = conexion.cursor()
+    cursorDlt.execute('delete from platillos where ID = ?', (id,))
+    conexion.commit()
     flash('Se elimino el producto')
     return redirect(url_for('buscarm'))
-
 
 @app.route('/registroa', methods=['GET', 'POST'])
 @login_required
 def registroa():
     if request.method == 'POST':
-        VMat = request.form['txtMat']
         VNom = request.form['txtNom']
         VAp = request.form['txtAp']
+        VAm = request.form['txtAm']
+        VTel = request.form['txtTel']
+        VMat = request.form['txtMat']
         VCorr = request.form['txtCorr']
         VPass = request.form['txtPass']
+        VFecha = datetime.now()
+        rol = 1
         
-        CS = mysql.connection.cursor()
-        CS.execute('INSERT INTO usuario (Matricula,Nombre, Apellidos, Correo, Contraseña, Rol) VALUES (%s,%s, %s, %s, %s,1)', (VMat, VNom, VAp, VCorr, VPass))
-        mysql.connection.commit()
+        CS = conexion.cursor()
+        CS.execute('INSERT INTO personas (nombre, ap, am, telefono, matricula, correo, contraseña, fechaalta, rol) VALUES (?,?,?,?,?,?,?,?,?)', (VNom, VAp, VAm, VTel, VMat, VCorr, VPass, VFecha, rol))
+        conexion.commit()
         flash('Administrador agregado correctamente')
         return redirect(url_for('main'))
 
@@ -454,8 +387,8 @@ def registroa():
 @app.route('/visualizarActc/<string:id>')
 @login_required
 def visualizarc(id):
-    cursorVis = mysql.connection.cursor()
-    cursorVis.execute('select * from usuario where Matricula = %s', (id,))
+    cursorVis = conexion.cursor()
+    cursorVis.execute('select * from personas where Matricula = %s', (id,))
     visualisarDatos = cursorVis.fetchone()
     return render_template('act_mi_usu.html', UpdUsuario = visualisarDatos)
 
@@ -464,37 +397,38 @@ def visualizarc(id):
 @login_required
 def actualizarc(id):
     if request.method == 'POST':
- 
-        varNombre = request.form['txtNombre']
-        varApellidos = request.form['txtApellidos']
-        varCorreo = request.form['txtCorreo']
-        varContraseña = request.form['txtContraseña']
-        cursorUpd = mysql.connection.cursor()
-        cursorUpd.execute('update usuario set Nombre = %s, Apellidos = %s, Correo = %s, Contraseña = %s where Matricula = %s', ( varNombre, varApellidos, varCorreo, varContraseña, id))
-        mysql.connection.commit()
+        VNom = request.form['txtNom']
+        VAp = request.form['txtAp']
+        VAm = request.form['txtAm']
+        VTel = request.form['txtTel']
+        VMat = request.form['txtMat']
+        VCorr = request.form['txtCorr']
+        VPass = request.form['txtPass']
+        VFecha = datetime.now()
+        rol = 1
+        cursorUpd = conexion.cursor()
+        cursorUpd.execute('update persona set nombre=?, ap=?, am=?, telefono=?, matricula=?, correo=?, contraseña=?, fechaalta=?, rol=? where Matricula = ?', ( VNom, VAp, VAm, VTel, VMat, VCorr, VPass, VFecha, rol, id))
+        conexion.commit()
     flash ('El usuario se actualizo correctamente.')
     return redirect(url_for('mc'))
 
 @app.route("/confirmacionc/<id>")
 @login_required
 def eliminarc(id):
-    cursorConfi = mysql.connection.cursor()
-    cursorConfi.execute('select * from usuario where Matricula = %s', (id,))
+    cursorConfi = conexion.cursor()
+    cursorConfi.execute('select * from personas where Matricula = ?', (id,))
     consuUsuario = cursorConfi.fetchone()
     return render_template('elim_mi_usu.html', usuario=consuUsuario)
 
 @app.route("/eliminarc/<id>", methods=['POST'])
 @login_required
 def eliminarBDc(id):
-    cursorDlt = mysql.connection.cursor()
-    cursorDlt.execute('delete from tarjetas where cliente = %s', (id,))
-    mysql.connection.commit()
-    cursorDlt = mysql.connection.cursor()
-    cursorDlt.execute('delete from ticket where id_cliente = %s', (id,))
-    mysql.connection.commit()
-    cursorDlt = mysql.connection.cursor()
-    cursorDlt.execute('delete from usuario where Matricula = %s', (id,))
-    mysql.connection.commit()
+    cursorDlt = conexion.cursor()
+    cursorDlt.execute('delete from pedidos where idpersonas = ?', (id,))
+    conexion.commit()
+    cursorDlt = conexion.cursor()
+    cursorDlt.execute('delete from personas where Matricula = ?', (id,))
+    conexion.commit()
     session.pop('Matricula', None)
     flash('Se elimino su cuenta')
     return redirect(url_for('login'))
@@ -503,8 +437,8 @@ def eliminarBDc(id):
 @login_required
 def mc():
     user_id = session.get('Matricula')
-    cursorBU = mysql.connection.cursor()
-    cursorBU.execute('SELECT * FROM usuario where Matricula = %s',(user_id,))
+    cursorBU = conexion.cursor()
+    cursorBU.execute('SELECT * FROM personas where Matricula = ?',(user_id,))
     consBU = cursorBU.fetchall()
     return render_template('mc.html', listaUsuario=consBU)
 
@@ -515,12 +449,12 @@ def buscarp():
     if request.method == 'POST':
         VBusc = request.form['busc']
         user_id = session.get('Matricula')
-        cursorBU = mysql.connection.cursor()
+        cursorBU = conexion.cursor()
         if not VBusc:
-            cursorBU.execute('SELECT t.ID, t.folio_ticket, t.id_cliente, m.Producto, t.cantidad, sum(t.cantidad *  m.precio) FROM ticket t INNER JOIN Menu m ON t.id_producto = m.ID where t.id_cliente = %s group by t.ID, t.folio_ticket, t.id_cliente, m.Producto, t.cantidad',(user_id,))
+            cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas ON pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillos = platillos.id WHERE pedidos.id = ? group by pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo',(user_id,))
 
         else:
-            cursorBU.execute('SELECT t.ID, t.folio_ticket, t.id_cliente, m.Producto, t.cantidad, sum(t.cantidad *  m.precio) FROM ticket t INNER JOIN Menu m ON t.id_producto = m.ID WHERE t.id_cliente = %s AND folio_ticket = %s group by t.ID, t.folio_ticket, t.id_cliente, m.Producto, t.cantidad', (user_id,VBusc, ))
+            cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas ON pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillos = platillos.id WHERE pedidos.id = ? group by pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo', (user_id,VBusc, ))
         consBP = cursorBU.fetchall()
         
         if consBP is not None:
@@ -529,27 +463,32 @@ def buscarp():
             mensaje = 'No se encontraron resultados.'
             return render_template('bmis_pedidos.html', mensaje=mensaje)
     user_id = session.get('Matricula')
-    cursorBU = mysql.connection.cursor()
-    cursorBU.execute('SELECT t.ID, t.folio_ticket, t.id_cliente, m.Producto, t.cantidad, sum(t.cantidad *  m.precio) FROM ticket t INNER JOIN Menu m ON t.id_producto = m.ID where t.id_cliente = %s group by t.ID, t.folio_ticket, t.id_cliente, m.Producto, t.cantidad',(user_id,))
+    cursorBU = conexion.cursor()
+    cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas ON pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillos = platillos.id WHERE pedidos.id = ? group by pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo',(user_id,))
     consBU = cursorBU.fetchall()
     return render_template('mis_pedidos.html', listaPedido=consBU)
 
 @app.route('/conf/<id>', methods=['GET', 'POST'])
 @login_required
 def conf(id):
-    curEditar = mysql.connection.cursor()
-    curEditar.execute('SELECT * FROM Menu WHERE producto = %s', (id,))
+    curEditar = conexion.cursor()
+    curEditar.execute('SELECT * FROM platillos WHERE nombreP = ?', (id,))
     producto_principal = curEditar.fetchone()
 
     if request.method == 'POST':
         Vcant = request.form['cantidad']
-        Vtot = request.form['total']
         user_id = session.get('Matricula')
-        cursorBU = mysql.connection.cursor()
-        ultimo_folio=obtener_ultimo_folio()
+        curID = conexion.cursor()
+        curID.execute('select id from platillos where nombreP = ?', (id,))
+        Vplatillos = curID.fetchone()
+        Ventrega = 6
+        Vpago = 2
+        fecha = datetime.now()
+        Vcafe = 1
+        cursorBU = conexion.cursor()
         
-        cursorBU.execute('INSERT INTO ticket(folio_ticket, id_cliente, id_producto, cantidad, total) VALUES (%s, %s, %s, %s, %s)', (ultimo_folio, user_id, id, Vcant, Vtot))
-        mysql.connection.commit()  # Commit the changes to the database
+        cursorBU.execute('INSERT INTO pedidos(idpersona, idplatillo, identrega, idpago, fecha, cantidad, idcafeteria) VALUES (?,?,?,?,?,?,?)', (user_id, Vplatillos, Ventrega, Vpago, fecha, Vcant, Vcafe))
+        conexion.commit()
         cursorBU.close()
         return redirect(url_for('menu'))
     
@@ -557,31 +496,25 @@ def conf(id):
 
 @app.route('/cerrar')
 def cerrar():
-    # Eliminar el correo electrónico del usuario de la sesión
     session.pop('Matricula', None)
-    # Redirigir al usuario a la página de inicio de sesión
     return redirect(url_for('index'))
-
 
 @app.route("/confirmacionp/<id>")
 @login_required
 def eliminarp(id):
-    cursorConfi = mysql.connection.cursor()
-    cursorConfi.execute('select * from ticket where ID = %s', (id,))
+    cursorConfi = conexion.cursor()
+    cursorConfi.execute('select * from pedidos where ID = ?', (id,))
     consuUsuario = cursorConfi.fetchone()
     return render_template('borrar_prod.html', menu=consuUsuario)
 
 @app.route("/eliminarp/<id>", methods=['POST'])
 @login_required
 def eliminarBDp(id):
-    cursorDlt = mysql.connection.cursor()
-    cursorDlt.execute('delete from ticket where ID = %s', (id,))
-    mysql.connection.commit()
+    cursorDlt = conexion.cursor()
+    cursorDlt.execute('delete from pedidos where ID = ?', (id,))
+    conexion.commit()
     flash('Se elimino el producto')
     return redirect(url_for('menu'))
-
-
-
 
 #Ejecucion de servidor
 if __name__ =='__main__':
