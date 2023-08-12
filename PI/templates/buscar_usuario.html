@@ -39,11 +39,11 @@
                     {% if listaUsuario %}
                     {% for alb in listaUsuario %} 
                     <tr>
-                        <td> {{ alb.0 }} </td>
+                        <td> {{ alb.5 }} </td>
                         <td> {{ alb.1 }} </td>
                         <td> {{ alb.2 }} </td>
                         <td> {{ alb.3 }} </td>
-                        {%if alb.5 == 2 %}
+                        {%if alb.9 == 2 %}
                         <td> Usuario </td>
                         {% else %}
                         <td> Administrador </td>
