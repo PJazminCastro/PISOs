@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar usuario</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleBuscar.css') }}">
+</head>
+<body>
+    <div class="form-main">
+    <form action="{{ url_for('mc')}}" method="POST">
+        <center><h1>Mi cuenta</h1></center>
+        <table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Matricula</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Correo</th>
+                       
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if listaUsuario %}
+                    {% for alb in listaUsuario %} 
+                    <tr>
+                        <td> {{ alb.0 }} </td>
+                        <td> {{ alb.1 }} </td>
+                        <td> {{ alb.2 }} </td>
+                        <td> {{ alb.3 }} </td>
+                        <td> 
+                            <a href=/visualizarActc/{{alb.0}}  class="btn" >Actualizar</a>
+                            <a href=/confirmacionc/{{alb.0}} class="btnD">Eliminar</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="5">No se encontraron resultados</td>
+                      </tr>
+                    {% endif %}
+                </tbody>
+        </table>
+
+       
+
+    </form>
+    
+    </div>
+    <a href="/cliente" class="btn">Regresar al menú principal</a>
+</body>
+</html>

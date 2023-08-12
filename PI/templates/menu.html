@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleMenu.css') }}">
+</head>
+<body>
+    
+    <h1>Menu</h1>
+    <div class="wrap column-4 columns">
+        {% for producto in productos %}
+        <div class="tarjeta-caf" style="background: url('{{ url_for('static', filename='img/'+producto[0]+'.jpg') }}') center; background-size: cover;">
+
+
+            <div class="wrap-text_tarjeta-caf">
+                <h3>{{ producto[0] }}</h3>
+                <div class="cta-wrap_tarjeta-caf">
+                    <div class="precio_tarjeta-caf">
+                        <span>${{ producto[1] }}</span>
+                    </div>
+                    <div class="cta_tarjeta-caf">
+                        <a href="/conf/{{ producto[0] }}"  class="btn" >Agregar</a>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+        <div class="tabla-container">
+            <center><h1>Mi Pedido</h1></center>
+        <table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Folio</th>
+                        <th>Cliente</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if listaPedido %}
+                    {% for alb in listaPedido %} 
+                    <tr>
+                        <td> {{ alb.1 }} </td>
+                        <td> {{ alb.2 }} </td>
+                        <td> {{ alb.3 }} </td>
+                        <td> {{ alb.4 }} </td>
+                        <td> {{ alb.5 }} </td>
+                        <td>
+                            <a href=/confirmacionp/{{alb.0}} class="btnD">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="5">No se ha agregado ningun producto</td>
+                      </tr>
+                    {% endif %}
+                    </tbody>
+            </table>
+            
+    </div>
+
+    
+    <center>
+        <form action="/orden">
+            <button type="submit" class="btn" name="realizar_pedido">Realizar Pedido</button>
+        </form>
+        <a href="/cliente" class="btn">Regresar al menú principal</a>
+    </center>
+</body>
+</html>

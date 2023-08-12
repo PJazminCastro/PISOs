@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleMenu.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+<body>
+    {% with mensajes = get_flashed_messages() %}
+    {% if mensajes %}
+        <!-- Iterar a través de los mensajes flash -->
+        {% for msj in mensajes %}
+            <!-- Agregar un script para mostrar el mensaje con SweetAlert -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '{{ msj }}',
+                        showConfirmButton: false,
+                        timer: 2000 // 2 segundos
+                    });
+                });
+            </script>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+    <div class="fo
+        <div class="tabla-container">
+            <center><h1>Mi Pedido</h1></center>
+        <table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Folio</th>
+                        <th>Cliente</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if listaPedido %}
+                    {% for alb in listaPedido %} 
+                    <tr>
+                        <td> {{ alb.1 }} </td>
+                        <td> {{ alb.2 }} </td>
+                        <td> {{ alb.3 }} </td>
+                        <td> {{ alb.4 }} </td>
+                        <td> {{ alb.5 }} </td>
+                       
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="5">No se encontraron resultados</td>
+                      </tr>
+                    {% endif %}
+                    </tbody>
+            </table>
+            
+    </div>
+
+    
+    <center>
+        <a href="/cliente" class="btn">Regresar al menú principal</a>
+    </center>
+</body>
+</html>

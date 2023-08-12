@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Principal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleRegistro.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    {% with mensajes = get_flashed_messages() %}
+    {% if mensajes %}
+        <!-- Iterar a través de los mensajes flash -->
+        {% for msj in mensajes %}
+            <!-- Agregar un script para mostrar el mensaje con SweetAlert -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '{{ msj }}',
+                        showConfirmButton: false,
+                        timer: 2000 // 2 segundos
+                    });
+                });
+            </script>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+    <center>
+    <h2>Menú Principal del Administrador</h2>
+</center>
+        
+    <div class="form-main">
+        <div class="form-conte">
+            <div class="box">
+                
+       
+        <form action="{{ url_for('buscarm') }}" method="GET">
+            <button type="submit" class="btn iniciar-sesion-btn">Consutar Menú</button>
+        </form>     
+        <form action="{{ url_for('vista_prev') }}" method="GET">
+            <button type="submit" class="btn iniciar-sesion-btn">Vista previa</button>
+        </form>                 
+        <form action="{{ url_for('nuevo') }}" method="GET">
+            <button type="submit" class="btn iniciar-sesion-btn">Nuevo Producto</button>
+        </form>
+
+        <form action="{{ url_for('buscar') }}" method="GET">
+            <button type="submit" class="btn iniciar-sesion-btn">Buscar Pedidos</button>
+        </form>
+
+        <form action="{{ url_for('buscaru') }}" method="GET">
+            <button type="submit" class="btn iniciar-sesion-btn">Consultar Usuarios</button>
+        </form>
+
+        <form action="{{ url_for('registroa') }}" method="GET">
+            <button type="submit" class="btn iniciar-sesion-btn">Nuevo Administrador</button>
+        </form>
+        <form action="{{ url_for('cerrar') }}" method="GET">
+            <button type="submit" class="btn iniciar-sesion-btn">Cerrar Sesión</button>
+        </form>
+
+  
+
+            </div>
+        </div>
+    </div>  
+        
+    
+</body>
+</html>

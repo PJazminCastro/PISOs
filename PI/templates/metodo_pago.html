@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Método de pago</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleMetodo.css') }}">
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const metodoPagoSelect = document.getElementById('metodo_pago');
+            const tarjetaFields = document.getElementById('tarjeta_fields');
+
+            metodoPagoSelect.addEventListener('change', () => {
+                if (metodoPagoSelect.value === 'tarjeta') {
+                    tarjetaFields.style.display = 'block';
+                } else {
+                    tarjetaFields.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="titmet">
+        <header>
+            <h1>Método pago</h1>
+        </header>
+    </div>
+    <form action="/met/{{UpdUsuario.0}}" method="post">
+        <div class="select">
+            <select name="txtMet" id="metodo_pago">
+                <option selected disabled>Metodo de pago</option>
+                <option value="tarjeta">Tarjeta credito/debito</option>
+                <option value="efectivo">Efectivo</option>
+            </select>
+        </div>
+        <div id="tarjeta_fields" style="display: none;">
+
+            <label for="numero_tarjeta">Número de tarjeta:</label>
+            <input type="text" id="numero_tarjeta" name="txtNum" required maxlength="16" minlength="16"><br>
+            
+            <label for="nombre_tarjeta">Nombre en la tarjeta:</label>
+            <input type="text" id="nombre_tarjeta" name="txtNom" required><br>
+
+            <label for="nombre_tarjeta">Fecha de vencimiento:</label>
+            <input type="text" id="fecha_vencimiento" name="txtVen" required maxlength="5" minlength="5" pattern="(0[1-9]|1[0-2])\/\d{2}" title="Ingresa una fecha en formato MM/AA" placeholder="MM/AA"><br>
+
+            <label for="nombre_tarjeta">CVV:</label>
+            <input type="text" id="cvv" name="txtCVV" required  minlength="3" maxlength="3"><br>
+            
+        </div>
+        <button type="submit" class="btn">Guardar</button>
+    </form>
+</body>
+</html>

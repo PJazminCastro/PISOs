@@ -122,7 +122,7 @@ def orden():
     nuevo_folio = obtener_ultimo_folio()
     user_id = session.get('Matricula')
     cursorBU = conexion.cursor()
-    cursorBU.execute('SELECT pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.precio) FROM pedidos INNER JOIN platillos ON pedidos.idplatillo = platillos.id where pedidos.idpersona = ? and pedidos.id = ? group by pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad',(user_id, nuevo_folio))
+    cursorBU.execute('SELECT pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN platillos ON pedidos.idplatillo = platillos.id inner join personas on pedidos.idpersona = personas.id where pedidos.idpersona = ? and pedidos.id = ? group by pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad',(user_id, nuevo_folio))
     consBU = cursorBU.fetchall()
     if not consBU:
         flash('No se realizó ninguna orden, por favor ordene algun producto.')
@@ -474,7 +474,7 @@ def conf(id):
         cursorBU = conexion.cursor()
         Vestatus = 6
         Vpago = 2
-        fecha = datetime.now
+        fecha = datetime.now()
         Vcafe = 1
         
         cursorBU.execute('INSERT INTO pedidos(idpersona, idplatillo, identrega, idpago, fecha, cantidad, idcafeteria) VALUES (?,?,?,?,?,?,?)', (user_id, id, Vestatus, Vpago, fecha, Vcant, Vcafe))

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleMenu.css') }}">
+</head>
+<body>
+    <h1>Menu</h1>
+    <div class="wrap column-4 columns">
+        {% for producto in productos %}
+        <div class="tarjeta-caf" style="background: url('{{ url_for('static', filename='img/'+producto[0]+'.jpg') }}') center; background-size: cover;">
+
+
+            <div class="wrap-text_tarjeta-caf">
+                <h3>{{ producto[0] }}</h3>
+                <div class="cta-wrap_tarjeta-caf">
+                    <div class="precio_tarjeta-caf">
+                        <span>${{ producto[1] }}</span>
+                    </div>
+                    <div class="cta_tarjeta-caf">
+                        <button type="button" class="btn" data-producto="{{ producto[0] }}">Agregar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <center>
+    <a href="/main" class="btn">Regresar al menú principal</a>
+</center>
+</body>
+</html>
