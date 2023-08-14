@@ -11,9 +11,7 @@
 <body>
     {% with mensajes = get_flashed_messages() %}
     {% if mensajes %}
-        <!-- Iterar a través de los mensajes flash -->
         {% for msj in mensajes %}
-            <!-- Agregar un script para mostrar el mensaje con SweetAlert -->
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     Swal.fire({
@@ -27,7 +25,7 @@
         {% endfor %}
     {% endif %}
 {% endwith %}
-    <div class="fo
+    <div class="form">
         <div class="tabla-container">
             <center><h1>Mi Pedido</h1></center>
         <table>
@@ -45,11 +43,11 @@
                     {% if listaPedido %}
                     {% for alb in listaPedido %} 
                     <tr>
+                        <td> {{ alb.0 }} </td>
                         <td> {{ alb.1 }} </td>
                         <td> {{ alb.2 }} </td>
                         <td> {{ alb.3 }} </td>
                         <td> {{ alb.4 }} </td>
-                        <td> {{ alb.5 }} </td>
                        
                     </tr>
                     {% endfor %}
