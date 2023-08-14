@@ -103,14 +103,14 @@ def menu():
     user_id = session.get('matricula')
     estatus = "Disponible"
     cursorBU = conexion.cursor()
-    cursorBU.execute('SELECT pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad * platillos.costo) FROM pedidos INNER JOIN personas on pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id where personas.matricula = ? and pedidos.id = ? and estatus = ? group by pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo',(user_id, ultimo_folio, estatus))
+    cursorBU.execute('SELECT pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad * platillos.costo) FROM pedidos INNER JOIN personas on pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id where personas.matricula = ? and pedidos.id = ? and platillos.estatus = ? group by pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo',(user_id, ultimo_folio, estatus))
     consBU = cursorBU.fetchall()
     flash("Su orden es la numero " + str(ultimo_folio) + ", Favor de pagar en caja") 
     return render_template('menu.html', productos=productos, listaPedido=consBU)
 
 def obtener_productos():
     cursor = conexion.cursor()
-    cursor.execute("SELECT nombreP, costo, estatus FROM platillos")
+    cursor.execute("SELECT * FROM platillos where estatus = 'disponible'")
     productos = cursor.fetchall()
     cursor.close()
     return productos
