@@ -47,13 +47,10 @@
     function actualizarPrecio() {
         const cantidadInput = document.getElementById('cantidad');
         const cantidad = parseInt(cantidadInput.value);
-        const precioUnitario = parseFloat('{{producto_principal[2]}}'); // Obtén el precio del producto desde Flask y conviértelo a número
-
+        const precioUnitario = parseFloat('{{producto_principal[2]}}'); 
         const total = cantidad * precioUnitario;
-        document.getElementById('total').value = total.toFixed(2); // Actualiza el valor del cuadro de texto con el nuevo total
+        document.getElementById('total').value = total.toFixed(2); 
     }
-    
-    // Llama a la función para calcular el precio total al cargar la página
     actualizarPrecio();
 </script>
 </html>

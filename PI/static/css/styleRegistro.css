@@ -157,7 +157,7 @@ body::after{
 }
 .form-main {
     overflow-y: scroll;
-    height: 600px; /* Ajusta esta altura según tus necesidades */
+    height: 700px; /* Ajusta esta altura según tus necesidades */
 }
 
 /* Estilos para el textarea */

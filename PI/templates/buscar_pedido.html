@@ -7,13 +7,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styleBuscar.css') }}">
 </head>
 <body>
-        <form action="/buscar" method="post">
-        <div class="contenedor">
-            <h1>Buscar pedido</h1>
+    <h1>Buscar pedido</h1>
             <div class="input-box">
                 <input type="text" name="busc" placeholder="Folio pedido" class="input-control">
             </div>
             <button type="submit" class="btn">Buscar</button>
+        <form action="/buscar" method="post">
+        <div class="contenedor">
+            
         </div>
             <div class="container"></div>
         <table>
@@ -23,6 +24,8 @@
                         <th>Folio</th>
                         <th>Cliente</th>
                         <th>Producto</th>
+                        <th>Estatus</th>
+                        <th>Metodo de pago</th>
                         <th>Cantidad</th>
                         <th>Total</th>
                     </tr>
@@ -36,6 +39,8 @@
                         <td> {{ alb.2 }} </td>
                         <td> {{ alb.3 }} </td>
                         <td> {{ alb.4 }} </td>
+                        <td> {{ alb.5 }} </td>
+                        <td> {{ alb.6 }} </td>
                     </tr>
                     {% endfor %}
                     {% else %}
@@ -45,10 +50,7 @@
                     {% endif %}
                 </tbody>
         </table>
-
-        
-
-    </form> 
-    <a href="/main" class="btn">Regresar al menú principal</a>  
+    </form>
+    <a href="/main" class="btn">Regresar al menú principal</a>   
 </body>
 </html>

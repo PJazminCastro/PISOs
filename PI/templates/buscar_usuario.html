@@ -15,58 +15,53 @@
         {% endif %}
     {%endwith%}
     <div class="form-main">
-    <form action="{{ url_for('buscaru')}}" method="POST">
-        
-        <div class="input-box">
-            <h1>Buscar usuario</h1>
-            <input type="text" name ="busc" placeholder="Matricula" class="input-control">
-        </div>
-        <button type="submit" class="btn">Buscar</button>
-        
-        <table>
+        <form action="{{ url_for('buscaru')}}" method="POST">
+            
+            <div class="input-box">
+                <h1>Buscar usuario</h1>
+                <input type="text" name ="busc" placeholder="Matricula" class="input-control">
+            </div>
+            <button type="submit" class="btn">Buscar</button>
             <table>
-                <thead>
-                    <tr>
-                        <th>Matricula</th>
-                        <th>Nombre</th>
-                        <th>Apellidos</th>
-                        <th>Correo</th>
-                        <th>Rol</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if listaUsuario %}
-                    {% for alb in listaUsuario %} 
-                    <tr>
-                        <td> {{ alb.5 }} </td>
-                        <td> {{ alb.1 }} </td>
-                        <td> {{ alb.2 }} </td>
-                        <td> {{ alb.3 }} </td>
-                        {%if alb.9 == 2 %}
-                        <td> Usuario </td>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Matricula</th>
+                            <th>Nombre</th>
+                            <th>Apellidos</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if listaUsuario %}
+                        {% for alb in listaUsuario %} 
+                        <tr>
+                            <td> {{ alb.5 }} </td>
+                            <td> {{ alb.1 }} </td>
+                            <td> {{ alb.2 }} </td>
+                            <td> {{ alb.3 }} </td>
+                            {%if alb.9 == 2 %}
+                            <td> Usuario </td>
+                            {% else %}
+                            <td> Administrador </td>
+                            {% endif %}
+                    
+                            <td> 
+                                <a href=/visualizarAct/{{alb.0}}  class="btn" >Actualizar</a>
+                                <a href=/confirmacion/{{alb.0}} class="btnD">Eliminar</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
                         {% else %}
-                        <td> Administrador </td>
+                        <tr>
+                            <td colspan="5">No se encontraron resultados</td>
+                        </tr>
                         {% endif %}
-                   
-                        <td> 
-                            <a href=/visualizarAct/{{alb.0}}  class="btn" >Actualizar</a>
-                            <a href=/confirmacion/{{alb.0}} class="btnD">Eliminar</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    {% else %}
-                    <tr>
-                        <td colspan="5">No se encontraron resultados</td>
-                      </tr>
-                    {% endif %}
-                </tbody>
-        </table>
-
-       
-
-    </form>
-    
+                    </tbody>
+            </table>
+        </form>
     </div>
     <a href="/main" class="btn">Regresar al menú principal</a>
 </body>

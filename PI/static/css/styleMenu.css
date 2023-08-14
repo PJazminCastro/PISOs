@@ -275,3 +275,7 @@ tbody tr{
 tbody tr:hover{
     background: rgba(243, 183, 199, 0.4);
 }
+.btn:hover,
+a.btn:hover {
+    background: linear-gradient(to right, var(--green), var(--buton-hover-color));
+}

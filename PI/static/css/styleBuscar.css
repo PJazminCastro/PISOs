@@ -145,3 +145,11 @@ tbody tr:hover{
     height: 600px; /* Ajusta esta altura según tus necesidades */
     padding-right: 15px;
 }
+.btn:hover,
+a.btn:hover {
+    background: linear-gradient(to right, var(--green), var(--buton-hover-color));
+}
+.sin-stock {
+    background-color: #580909; /* Cambia el color de fondo según tu preferencia */
+    font-weight: bold; /* Otra opción es cambiar el peso de la fuente */
+}

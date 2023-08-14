@@ -101,15 +101,16 @@ def menu():
     productos = obtener_productos()
     ultimo_folio = obtener_ultimo_folio()
     user_id = session.get('matricula')
+    estatus = "Disponible"
     cursorBU = conexion.cursor()
-    cursorBU.execute('SELECT pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad * platillos.costo) FROM pedidos INNER JOIN personas on pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id where personas.matricula = ? and pedidos.id = ? group by pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo',(user_id, ultimo_folio))
+    cursorBU.execute('SELECT pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad * platillos.costo) FROM pedidos INNER JOIN personas on pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id where personas.matricula = ? and pedidos.id = ? and estatus = ? group by pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo',(user_id, ultimo_folio, estatus))
     consBU = cursorBU.fetchall()
     flash("Su orden es la numero " + str(ultimo_folio) + ", Favor de pagar en caja") 
     return render_template('menu.html', productos=productos, listaPedido=consBU)
 
 def obtener_productos():
     cursor = conexion.cursor()
-    cursor.execute('SELECT * FROM platillos')
+    cursor.execute("SELECT nombreP, costo, estatus FROM platillos")
     productos = cursor.fetchall()
     cursor.close()
     return productos
@@ -120,24 +121,6 @@ def agregar_producto(nombre, precio, estatus):
     cursor.execute('INSERT INTO platillos (nombreP, costo, estatus) VALUES (?,?,?)', (nombre, precio, estatus))
     cursor.commit()
     cursor.close()
-
-@app.route('/orden', methods=['GET', 'POST'])
-@login_required
-def orden():
-    productos = obtener_productos()
-    nuevo_folio = obtener_ultimo_folio()
-    user_id = session.get('Matricula')
-    cursorBU = conexion.cursor()
-    cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas ON pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = pedidos.id where personas.matricula = ? and pedidos.id = ? group by pedidos.ID, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo',(user_id, nuevo_folio))
-    consBU = cursorBU.fetchall()
-    if not consBU:
-        flash('No se realizó ninguna orden, por favor ordene algun producto.')
-        return redirect(url_for('menu'))
-    else:
-        CS = conexion.cursor()
-        CS.execute('INSERT INTO orden (x) VALUES (1)')
-        conexion.commit()
-        return render_template('orden.html', productos=productos, listaPedido=consBU, nuevo_folio=nuevo_folio)
 
 def obtener_ultimo_folio():
     cursor = conexion.cursor()
@@ -154,10 +137,10 @@ def buscar():
         
         cursorBU = conexion.cursor()
         if not VBusc:
-            cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas on pedidos.idpersona  = personas.id inner join platillos on pedidos.idplatillo = platillos.id group by pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo')
+            cursorBU.execute('select pedidos.id, personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, cantidad, sum(pedidos.cantidad *  platillos.costo) from pedidos inner join personas on pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id inner join entregas on pedidos.identrega = entregas.id inner join metoPago on pedidos.idpago = metoPago.id  group by personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, pedidos.cantidad, pedidos.id')
 
         else:
-            cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas ON pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id WHERE pedidos.id = ? group by pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo', (VBusc,))
+            cursorBU.execute('select pedidos.id, personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, cantidad, sum(pedidos.cantidad *  platillos.costo) from pedidos inner join personas on pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id inner join entregas on pedidos.identrega = entregas.id inner join metoPago on pedidos.idpago = metoPago.id WHERE pedidos.id = ? group by personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, pedidos.cantidad, pedidos.id', (VBusc,))
         consBP = cursorBU.fetchall()
         
         if consBP is not None:
@@ -166,8 +149,7 @@ def buscar():
             mensaje = 'No se encontraron resultados.'
             return render_template('buscar_pedido.html', mensaje=mensaje)
     cursorBU = conexion.cursor()
-    cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas ON pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id group by pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo')
-
+    cursorBU.execute('select pedidos.id, personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, cantidad, sum(pedidos.cantidad *  platillos.costo) from pedidos inner join personas on pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id inner join entregas on pedidos.identrega = entregas.id inner join metoPago on pedidos.idpago = metoPago.id  group by personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, pedidos.cantidad, pedidos.id')
     consBU = cursorBU.fetchall()
     return render_template('buscar_pedido.html', listaPedido=consBU)
 
@@ -204,21 +186,21 @@ def actualizar(id):
 @login_required
 def eliminar(id):
     cursorConfi = conexion.cursor()
-    cursorConfi.execute('select * from personas where id = ?', int(id))
-    consuUsuario = cursorConfi.fetchall()
+    cursorConfi.execute('select * from personas where id = ?', (id,))
+    consuUsuario = cursorConfi.fetchone()
     return render_template('borrar_usuarios.html', usuario=consuUsuario)
 
-@app.route("/eliminar/<id>", methods=['POST'])
+@app.route("/eliminar/<string:id>", methods=['POST'])
 @login_required
 def eliminarBD(id):
     if request.method == 'POST':
         cursorDlt = conexion.cursor()
-        cursorDlt.execute('delete from pedidos where idpersona = ?', (id))
+        cursorDlt.execute('delete from pedidos where idpersona = ?', (id,))
         conexion.commit()
-        cursorDlt = conexion.cursor()
         cursorDlt.execute('delete from personas where id = ?', (id,))
         conexion.commit()
-    flash('Se elimino el usuario con Matricula'+ id)
+
+    flash('Se eliminó el usuario con Matricula ' + id)
     return redirect(url_for('buscaru'))
 
 @app.route('/buscaru', methods=['GET', 'POST'])
@@ -478,18 +460,16 @@ def conf(id):
         cursoridp.execute('select id from personas where matricula = ?', (user_id))
         Vidp = cursoridp.fetchone()
         curID = conexion.cursor()
-        curID.execute('select id from platillos where nombreP = ?', (id,))
+        curID.execute('select id from platillos where id = ?', (id,))
         Vplatillos = curID.fetchone()
         Ventrega = 6
         Vpago = 2
         fecha = datetime.now()
         Vcafe = 1
-        cursorBU = conexion.cursor()
-        cursorBU.execute('INSERT INTO pedidos(idpersona, idplatillo, identrega, idpago, fecha, cantidad, idcafeteria) VALUES (?,?,?,?,?,?,?)', (Vidp, str(Vplatillos), Ventrega, Vpago, fecha, Vcant, Vcafe))
-        cursorBU.commit()
-        cursorBU.close()
+        with conexion.cursor() as cursorBU:
+            cursorBU.execute('INSERT INTO pedidos(idpersona, idplatillo, identrega, idpago, fecha, cantidad, idcafeteria) VALUES (?,?,?,?,?,?,?)', (Vidp[0], Vplatillos[0], Ventrega, Vpago, fecha, Vcant, Vcafe))
+            cursorBU.commit()
         return redirect(url_for('menu'))
-    
     return render_template('compra.html', producto_principal=producto_principal)
 
 @app.route('/cerrar')
@@ -513,6 +493,32 @@ def eliminarBDp(id):
     conexion.commit()
     flash('Se elimino el producto')
     return redirect(url_for('menu'))
+
+@app.route('/buscari', methods=['GET', 'POST'])
+def buscari():
+    if request.method == 'POST':
+        VBusc = request.form['busc']
+        cursorBU = conexion.cursor()
+        if not VBusc:
+            cursorBU.execute('SELECT * FROM ingredientes')
+        else:
+            cursorBU.execute('SELECT * FROM ingredientes WHERE nombre = ?', str(VBusc))
+        consBU = cursorBU.fetchall()
+        if consBU is not None:
+            return render_template('ingredientes.html', listaIngredientes=consBU)
+        else:
+            mensaje = 'No se encontraron resultados.'
+            return render_template('ingredientes.html', mensaje=mensaje)
+
+    cursorBU = conexion.cursor()
+    cursorBU.execute('SELECT * FROM ingredientes')
+    consBU = cursorBU.fetchall()
+    return render_template('ingredientes.html', listaIngredientes=consBU)
+
+
+
+#Procedimiento 2: Cancelar un pedido
+
 
 #Ejecucion de servidor
 if __name__ =='__main__':

@@ -137,3 +137,7 @@ select{
     overflow-y: scroll;
     height: 600px; /* Ajusta esta altura según tus necesidades */
 }
+.btn:hover,
+a.btn:hover {
+    background: linear-gradient(to right, var(--green), var(--buton-hover-color));
+}

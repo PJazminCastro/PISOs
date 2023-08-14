@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleBuscar.css') }}">
+    <title>Ingredientes</title>
+</head>
+<body>
+    <form action="/buscari" method="post">
+        <div class="contenedor">
+            <h1>{% if idcafeteria == 0 %} Ingredientes sin stock {% else %} Ingredientes en la cafetería {% endif %}</h1>
+            <div class="input-box">
+                <input type="text" name="busc" placeholder="Ingrediente" class="input-control">
+            </div>
+            <button type="submit" class="btn">Buscar</button>
+            <a href="/ingredientesCero" class="btn" id="btn-ingredientes-sin-stock">Ingredientes sin stock</a>
+        </div>
+        <div class="container">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if listaIngredientes %}
+                        {% for ingrediente in listaIngredientes %}
+                        <tr {% if ingrediente.2 == 0 %}class="sin-stock"{% endif %}>
+                            <td>{{ ingrediente.0 }}</td>
+                            <td>{{ ingrediente.1 }}</td>
+                            <td>{{ ingrediente.2 }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="5">No se encontraron resultados</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <a href="/main" class="btn">Regresar al menú principal</a>
+    </form>
+    <script>
+        document.getElementById('btn-ingredientes-sin-stock').addEventListener('click', function(event) {
+            event.preventDefault();
+            const sinStockRows = document.querySelectorAll('.sin-stock');
+            if (sinStockRows.length > 0) {
+                const offsetTop = sinStockRows[0].offsetTop;
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = document.querySelector('table');
+            const sinStockRows = document.querySelectorAll('.sin-stock');
+
+            sinStockRows.forEach(row => {
+                table.removeChild(row);
+                table.insertBefore(row, table.firstChild);
+            });
+        });
+    </script>
+</body>
+</html>
