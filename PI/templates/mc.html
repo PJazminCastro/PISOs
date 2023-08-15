@@ -4,47 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buscar usuario</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleBuscar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleRegistro.css') }}">
 </head>
 <body>
     <div class="form-main">
-    <form action="{{ url_for('mc')}}" method="POST">
-        <center><h1>Mi cuenta</h1></center>
-        <table>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Matricula</th>
-                        <th>Nombre</th>
-                        <th>Apellidos</th>
-                        <th>Correo</th>
-                       
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
+        <div class="form-conte">
+            <div class="box">
+                <form action="{{ url_for('mc')}}" method="POST">
+                    <center><h1>Mi cuenta</h1></center>
                     {% if listaUsuario %}
                     {% for alb in listaUsuario %} 
-                    <tr>
-                        <td> {{ alb.0 }} </td>
-                        <td> {{ alb.1 }} </td>
-                        <td> {{ alb.2 }} </td>
-                        <td> {{ alb.3 }} </td>
-                        <td> 
-                            <a href=/visualizarActc/{{alb.0}}  class="btn" >Actualizar</a>
-                            <a href=/confirmacionc/{{alb.0}} class="btnD">Eliminar</button>
-                        </td>
-                    </tr>
+                        <div class="input-box">
+                            <input type="text" Name="txtNom" placeholder="Nombre" class="input-control" value="{{alb.1}}" readonly>
+                        </div>
+                        <div class="input-box">
+                            <input type="text" Name="txtAp" placeholder="Apellido paterno" class="input-control" value="{{alb.2}}" readonly>
+                        </div>
+                        <div class="input-box">
+                            <input type="text" Name="txtAm" placeholder="Apellido materno" class="input-control" value="{{alb.3}}" readonly>
+                        </div>
+                        <div class="input-box">
+                            <input type="text" Name="txtTel" placeholder="Telefono" class="input-control" value="{{alb.4}}" readonly>
+                        </div>
+                        <div class="input-box">
+                            <input type="text" Name="txtMat" placeholder="Matricula" class="input-control" value="{{alb.5}}" readonly>
+                        </div>
+                        <div class="input-box">
+                            <input type="text" Name="txtCorr" placeholder="Correo" class="input-control" value="{{alb.6}}" readonly>
+                        </div>
+                        <div class="input-box">
+                            <input type="password" Name="txtPass" placeholder="Contraseña" class="input-control" value="{{alb.7}}" readonly>
+                            <div class="input-link">
+                                <a href="#" class="gradient-text"></a>
+                            </div>
+                        </div>
+                        <a href=/visualizarAct/{{alb.0}}  class="btn" >Actualizar</a>
                     {% endfor %}
-                    {% else %}
-                    <tr>
-                        <td colspan="5">No se encontraron resultados</td>
-                      </tr>
                     {% endif %}
-                </tbody>
-        </table>
-    </form>
-    </div>
-    <a href="/cliente" class="btn">Regresar al menú principal</a>
+                    <a href="/cliente" class="btn">Regresar al menú principal</a>
+                </form>
+            </div>
+        </div>
+    </div>    
 </body>
 </html>
