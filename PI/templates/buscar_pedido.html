@@ -4,52 +4,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buscar pedido</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styleBuscar.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script> 
 </head>
 <body>
-    <h1>Buscar pedido</h1>
+    
     <form action="/buscar" method="post">
         <div class="input-box">
+            <h1>Buscar pedido</h1>
             <input type="text" name="busc" placeholder="Folio pedido" class="input-control">
         </div>
-        <button type="submit" class="btn">Buscar</button>
+        <button type="submit" class="btn"><i class="bi bi-search"></i></button>
+        <div class="container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Folio</th>
+                        <th>Cliente</th>
+                        <th>Producto</th>
+                        <th>Estatus</th>
+                        <th>Metodo de pago</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if listaPedido %}
+                    {% for alb in listaPedido %} 
+                    <tr>
+                        <td> {{ alb.0 }} </td>
+                        <td> {{ alb.1 }} </td>
+                        <td> {{ alb.2 }} </td>
+                        <td> {{ alb.3 }} </td>
+                        <td> {{ alb.4 }} </td>
+                        <td> {{ alb.5 }} </td>
+                        <td> {{ alb.6 }} </td>
+                        <td>
+                            <a href="{{ url_for('ver_ticket', pedido_id=alb.0) }}" class="btn"><i class="bi bi-printer-fill"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="7">No se encontraron resultados</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
     </form>
-    <div class="container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Folio</th>
-                    <th>Cliente</th>
-                    <th>Producto</th>
-                    <th>Estatus</th>
-                    <th>Metodo de pago</th>
-                    <th>Cantidad</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if listaPedido %}
-                {% for alb in listaPedido %} 
-                <tr>
-                    <td> {{ alb.0 }} </td>
-                    <td> {{ alb.1 }} </td>
-                    <td> {{ alb.2 }} </td>
-                    <td> {{ alb.3 }} </td>
-                    <td> {{ alb.4 }} </td>
-                    <td> {{ alb.5 }} </td>
-                    <td> {{ alb.6 }} </td>
-                    <td>
-                        <a href="{{ url_for('ver_ticket', pedido_id=alb.0) }}" class="btn">Crear Ticket</a>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="7">No se encontraron resultados</td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>
     <a href="/main" class="btn">Regresar al menú principal</a>
+
 </body>
 </html>

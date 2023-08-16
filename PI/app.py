@@ -416,7 +416,7 @@ def buscarp():
             return render_template('mis_pedidos.html', listaPedido=consBP)
         else:
             mensaje = 'No se encontraron resultados.'
-            return render_template('bmis_pedidos.html', mensaje=mensaje)
+            return render_template('mis_pedidos.html', mensaje=mensaje)
     user_id = session.get('Matricula')
     cursorBU = conexion.cursor()
     cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas ON pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id WHERE personas.matricula = ? group by pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo',(user_id,))

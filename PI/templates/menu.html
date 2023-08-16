@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menú</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styleMenu.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"> 
 </head>
 <body>
     <h1>Menu</h1>
@@ -18,7 +19,7 @@
                         <span>${{ producto[1] }}</span>
                     </div>
                     <div class="cta_tarjeta-caf">
-                        <a href="/conf/{{ producto[0] }}" class="btn">Agregar</a>
+                        <a href="/conf/{{ producto[0] }}" class="btn"><i class="bi bi-bag-plus-fill"></i></a>
                     </div>
                 </div>
             </div>
