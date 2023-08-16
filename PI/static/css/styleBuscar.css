@@ -153,3 +153,20 @@ a.btn:hover {
     background-color: #580909; /* Cambia el color de fondo según tu preferencia */
     font-weight: bold; /* Otra opción es cambiar el peso de la fuente */
 }
+.btnVP{
+    height: 50px;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 500;
+    text-transform: capitalize;
+    cursor: pointer;
+    border-radius: 25px;
+    user-select: none;
+    background: linear-gradient(to right, var(--green), var(--lead));
+    border: none;
+    color: var(--text-white);
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    margin: 10px;
+}

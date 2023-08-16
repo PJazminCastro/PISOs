@@ -26,7 +26,6 @@
         {% endfor %}
     {% endif %}
 {% endwith %}
-    <div class="form-main">
     <form action="{{ url_for('buscarm')}}" method="POST">
         <div class="input-box">
             <h1>Buscar Producto</h1>
@@ -40,6 +39,7 @@
                         <th>ID</th>
                         <th>Producto</th>
                         <th>Precio</th>
+                        <th>Estatus</th>
                         <th>Acciones</th>
                     </tr>
             </thead>
@@ -49,7 +49,8 @@
                 <tr>
                     <td> {{ alb.0 }} </td>
                     <td> {{ alb.1 }} </td>
-                    <td> {{ alb.2 }} </td>           
+                    <td> {{ alb.2 }} </td>   
+                    <td> {{ alb.3 }} </td>        
                     <td> 
                         <a href=/visualizarMen/{{alb.0}}  class="btn" >Actualizar</a>
                         <a href=/confirmacionm/{{alb.0}} class="btnD">Eliminar</button>
@@ -64,7 +65,13 @@
             </tbody>
         </table>
     </form>
-    </div>
+
+            <div class="input-box">
+                <form action="{{ url_for('vista_prev') }}" method="GET">
+                    <button type="submit" class="btnVP">Vista previa</button>
+                </form>
+            </div>
+
     <a href="/main" class="btn">Regresar al menú principal</a>
 </body>
 </html>

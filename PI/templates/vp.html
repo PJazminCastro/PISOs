@@ -9,7 +9,7 @@
 <body>
     <h1>Menu</h1>
     <div class="wrap column-4 columns">
-        {% for producto in productos %}
+        {% for producto in productosD %}
         <div class="tarjeta-caf" style="background: url('{{ url_for('static', filename='img/'+producto[0]+'.jpg') }}') center; background-size: cover;">
 
 
@@ -28,7 +28,7 @@
         {% endfor %}
     </div>
     <center>
-    <a href="/main" class="btn">Regresar al menú principal</a>
+    <a href="/buscarm" class="btn">Regresar</a>
 </center>
 </body>
 </html>
