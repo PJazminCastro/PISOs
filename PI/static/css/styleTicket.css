@@ -221,7 +221,7 @@ label[for="imagen_producto"]:hover {
 a.btn {
     display: inline-block;
     height: 45px;
-    width: 100%;
+    width: 30%;
     font-size: 16px;
     font-weight: 500;
     text-transform: capitalize;
@@ -241,4 +241,56 @@ a.btn {
 .btn:hover,
 a.btn:hover {
     background: linear-gradient(to right, var(--green), var(--buton-hover-color));
+}
+/* Tu CSS existente */
+
+/* Estilos para centrar verticalmente todo el contenido */
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Estilos para el ticket */
+.ticket {
+    background-color: #53638d;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-top: 20px;
+}
+
+.ticket-item {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+/* Estilos para el botón de regresar */
+.btn {
+    display: block;
+    width: 100px;
+    margin: 20px auto;
+    padding: 10px 15px;
+    text-align: center;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+/* Responsiveness para el ticket */
+@media screen and (max-width: 600px) {
+    .ticket {
+        width: 90%;
+    }
 }

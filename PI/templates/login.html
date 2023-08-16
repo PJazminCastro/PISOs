@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styleRegistro.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body> {% with mensajes = get_flashed_messages() %}
+<body> 
+    {% with mensajes = get_flashed_messages() %}
     {% if mensajes %}
         <!-- Iterar a través de los mensajes flash -->
         {% for msj in mensajes %}

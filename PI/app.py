@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session
 from flask_login import UserMixin
 import pyodbc
 import os
@@ -137,10 +137,10 @@ def buscar():
         
         cursorBU = conexion.cursor()
         if not VBusc:
-            cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas ON pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id WHERE  group by pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo')
+            cursorBU.execute('select pedidos.id, personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, cantidad, sum(pedidos.cantidad *  platillos.costo) from pedidos inner join personas on pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id inner join entregas on pedidos.identrega = entregas.id inner join metoPago on pedidos.idpago = metoPago.id where entregas.id != 4 and entregas.id != 5 group by personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, pedidos.cantidad, pedidos.id')
 
         else:
-            cursorBU.execute('SELECT pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad *  platillos.costo) FROM pedidos INNER JOIN personas ON pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id WHERE pedidos.id = ? and personas.matricula = ? group by pedidos.id, personas.nombre, platillos.nombreP, pedidos.cantidad, platillos.costo', (VBusc,))
+            cursorBU.execute('select pedidos.id, personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, cantidad, sum(pedidos.cantidad *  platillos.costo) from pedidos inner join personas on pedidos.idpersona = personas.id inner join platillos on pedidos.idplatillo = platillos.id inner join entregas on pedidos.identrega = entregas.id inner join metoPago on pedidos.idpago = metoPago.id WHERE pedidos.id = ? group by personas.nombre, platillos.nombreP, entregas.estatus, metoPago.descripcion, pedidos.cantidad, pedidos.id', (VBusc,))
         consBP = cursorBU.fetchall()
         
         if consBP is not None:
@@ -519,6 +519,55 @@ def buscari():
 
 #Procedimiento 2: Cancelar un pedido
 
+
+#Funcion 2: Obtener el corte de caja de un dia [total vendido, stock de ingredientes actualizados, platillos disponibles]
+@app.route('/corte', methods=['POST'])
+def corte():
+    cursor = conexion.cursor()
+    fecha = request.form['fecha']
+    query = f"""
+        SELECT SUM(pedidos.cantidad * platillos.costo) AS Total_Vendido,
+               platillos.nombreP AS Platillo,
+               ingredientes.stock AS Stock_Ingredientes
+        FROM platillos
+        INNER JOIN receta ON receta.idplatillo = platillos.id
+        INNER JOIN ingredientes ON ingredientes.id = receta.idingrediente
+        INNER JOIN pedidos ON pedidos.idplatillo = platillos.id AND CONVERT(DATE, pedidos.fecha) = '{fecha}'
+        GROUP BY platillos.nombreP, ingredientes.stock
+    """
+    cursor.execute(query)
+    results = cursor.fetchall()
+
+    result_data = [
+        {
+            "Platillo": row.Platillo,
+            "Total_Vendido": row.Total_Vendido if row.Total_Vendido is not None else 0,
+            "Stock_Ingredientes": row.Stock_Ingredientes
+        }
+        for row in results
+    ]
+    return jsonify(result_data)
+
+#Funcion 1: Mostrar los datos que tendria un ticket de una compra [fecha, nombrecafe, productos, total, metodopago]
+@app.route('/ver_ticket/<int:pedido_id>')
+@login_required
+def ver_ticket(pedido_id):
+    cursor = conexion.cursor()
+    cursor.execute('SELECT pedidos.fecha, personas.nombre, platillos.nombreP, pedidos.cantidad, sum(pedidos.cantidad * platillos.costo) AS total, metoPago.descripcion FROM pedidos INNER JOIN personas ON pedidos.idpersona = personas.id INNER JOIN platillos ON pedidos.idplatillo = platillos.id INNER JOIN metoPago ON pedidos.idpago = metoPago.id WHERE pedidos.id = ? group by pedidos.fecha, personas.nombre, platillos.nombreP, pedidos.cantidad, metoPago.descripcion', (pedido_id,))
+    resultado = cursor.fetchone()
+
+    if resultado:
+        fecha = resultado.fecha
+        cliente = resultado.nombre
+        producto = resultado.nombreP
+        cantidad = resultado.cantidad
+        total = resultado.total
+        metodo_pago = resultado.descripcion
+
+        return render_template('ticket.html', fecha=fecha, cliente=cliente, producto=producto, cantidad=cantidad, total=total, metodo_pago=metodo_pago)
+    else:
+        flash('Pedido no encontrado.')
+        return redirect(url_for('buscar'))
 
 #Ejecucion de servidor
 if __name__ =='__main__':

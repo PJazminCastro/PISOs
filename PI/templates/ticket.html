@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket de Compra</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleTicket.css') }}">
+</head>
+<body>
+    <h1>Ticket de Compra</h1>
+    <div class="ticket">
+        <p class="ticket-item">Fecha: {{ fecha }}</p>
+        <p class="ticket-item">Cliente: {{ cliente }}</p>
+        <p class="ticket-item">Producto: {{ producto }}</p>
+        <p class="ticket-item">Cantidad: {{ cantidad }}</p>
+        <p class="ticket-item">Total: ${{ total }}</p>
+        <p class="ticket-item">Método de Pago: {{ metodo_pago }}</p>
+    </div>
+    <a href="{{ url_for('buscar') }}" class="btn">Regresar</a>
+</body>
+</html>

@@ -53,6 +53,50 @@
                 <form action="{{ url_for('registroa') }}" method="GET">
                     <button type="submit" class="btn iniciar-sesion-btn">Nuevo Administrador</button>
                 </form>
+
+                <!-- Formulario para mostrar el corte de caja -->
+                <form id="corte-form" action="{{ url_for('corte') }}" method="POST">
+                    <label for="fecha">Fecha:</label>
+                    <input type="date" id="fecha" name="fecha" required>
+                    <button type="submit" class="btn iniciar-sesion-btn">Corte de Caja</button>
+                </form>
+
+                <!-- Modal para mostrar resultados -->
+                <div id="modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-button" id="close-button">&times;</span>
+                        <table id="result-table">
+                            <!-- Resultados se agregarán aquí dinámicamente con JavaScript -->
+                        </table>
+                    </div>
+                </div>
+
+                <script>
+                    document.getElementById("corte-form").addEventListener("submit", function (event) {
+                        event.preventDefault();
+                        fetch(this.action, {
+                            method: this.method,
+                            body: new FormData(this)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            const modal = document.getElementById('modal');
+                            const resultTable = document.getElementById('result-table');
+                            resultTable.innerHTML = '<tr><th>Platillo</th><th>Total Vendido</th><th>Stock Ingredientes</th></tr>';
+                            data.forEach(row => {
+                                resultTable.innerHTML += `<tr><td>${row.Platillo}</td><td>${row.Total_Vendido}</td><td>${row.Stock_Ingredientes}</td></tr>`;
+                            });
+                            modal.style.display = 'block';
+                        });
+                    });
+
+                    // Cierra el modal al hacer clic en la "X"
+                    document.getElementById('close-button').addEventListener('click', () => {
+                        const modal = document.getElementById('modal');
+                        modal.style.display = 'none';
+                    });
+                </script>
+
                 <form action="{{ url_for('cerrar') }}" method="GET">
                     <button type="submit" class="btn iniciar-sesion-btn">Cerrar Sesión</button>
                 </form>
