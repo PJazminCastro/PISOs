@@ -61,10 +61,10 @@ def login():
         VCorr = request.form['txtMat']
         VPass = request.form['txtPass']
         CS = conexion.cursor()
-        consulta = "SELECT Correo FROM personas WHERE matricula = ? AND Contraseña = ?"
+        consulta = "SELECT Correo FROM personas WHERE matricula = ? AND Contraseña = ? and estatus = 1"
         CS.execute(consulta, (VCorr, VPass))
         resultado = CS.fetchone()
-        Rol = "Select Rol, Matricula from personas where matricula = ? and contraseña = ?"
+        Rol = "Select Rol, Matricula from personas where matricula = ? and contraseña = ? and estatus = 1"
         if resultado is not None:
             CS.execute(Rol,(VCorr, VPass))
             rol_resultado = CS.fetchone()
@@ -185,9 +185,9 @@ def eliminar(id):
 def eliminarBD(id):
     if request.method == 'POST':
         cursorDlt = conexion.cursor()
-        cursorDlt.execute('delete from pedidos where idpersona = ?', (id,))
+        cursorDlt.execute('update pedidos set identrega = 5 where idpersona = ?', (id,))
         conexion.commit()
-        cursorDlt.execute('delete from personas where id = ?', (id,))
+        cursorDlt.execute('update personas set estatus = 0 where id = ?', (id,))
         conexion.commit()
     flash('Se eliminó el usuario con Matricula ' + id)
     return redirect(url_for('buscaru'))
@@ -199,9 +199,9 @@ def buscaru():
         VBusc = request.form['busc']
         cursorBU = conexion.cursor()
         if not VBusc:
-            cursorBU.execute('SELECT * FROM personas')
+            cursorBU.execute('SELECT * FROM personas where estatus = 1')
         else:
-            cursorBU.execute('SELECT * FROM personas WHERE Matricula = ?', (VBusc,))
+            cursorBU.execute('SELECT * FROM personas WHERE Matricula = ? and estatus = 1', (VBusc,))
         consBU = cursorBU.fetchall()
         if consBU is not None:
             return render_template('buscar_Usuario.html', listaUsuario=consBU)
@@ -209,7 +209,7 @@ def buscaru():
             mensaje = 'No se encontraron resultados.'
             return render_template('buscar_Usuario.html', mensaje=mensaje)
     cursorBU = conexion.cursor()
-    cursorBU.execute('SELECT * FROM personas')
+    cursorBU.execute('SELECT * FROM personas where estatus = 1')
     consBU = cursorBU.fetchall()
     return render_template('buscar_Usuario.html', listaUsuario=consBU)
 
@@ -374,7 +374,7 @@ def actualizarc(id):
 @login_required
 def eliminarc(id):
     cursorConfi = conexion.cursor()
-    cursorConfi.execute('select * from personas where Matricula = ?', (id,))
+    cursorConfi.execute('select * from personas where Matricula = ? and estatus = 1', (id,))
     consuUsuario = cursorConfi.fetchone()
     return render_template('elim_mi_usu.html', usuario=consuUsuario)
 
@@ -382,10 +382,10 @@ def eliminarc(id):
 @login_required
 def eliminarBDc(id):
     cursorDlt = conexion.cursor()
-    cursorDlt.execute('delete from pedidos where idpersonas = ?', (id,))
+    cursorDlt.execute('delete from pedidos where idpersonas = ? and estatus = 1', (id,))
     conexion.commit()
     cursorDlt = conexion.cursor()
-    cursorDlt.execute('delete from personas where Matricula = ?', (id,))
+    cursorDlt.execute('delete from personas where Matricula = ? and estatus = 1', (id,))
     conexion.commit()
     session.pop('Matricula', None)
     flash('Se elimino su cuenta')
@@ -439,7 +439,7 @@ def conf(id):
         curID.execute('select id from platillos where id = ?', (id,))
         Vplatillos = curID.fetchone()
         Ventrega = 6
-        Vpago = 2
+        Vpago = 1
         fecha = datetime.now()
         Vcafe = 1
         with conexion.cursor() as cursorBU:
@@ -465,7 +465,7 @@ def eliminarp(id):
 @login_required
 def eliminarBDp(id):
     cursorDlt = conexion.cursor()
-    cursorDlt.execute('delete from pedidos where ID = ?', (id,))
+    cursorDlt.execute('update platillos set estatus = "No disponible" where id = ', (id,))
     conexion.commit()
     flash('Se elimino el producto')
     return redirect(url_for('menu'))

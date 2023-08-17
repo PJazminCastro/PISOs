@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscar usuario</title>
+    <title>Buscar platillo</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styleBuscar.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"> 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -37,7 +37,6 @@
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Producto</th>
                         <th>Precio</th>
                         <th>Estatus</th>
@@ -48,7 +47,6 @@
                 {% if listaUsuario %}
                 {% for alb in listaUsuario %} 
                 <tr>
-                    <td> {{ alb.0 }} </td>
                     <td> {{ alb.1 }} </td>
                     <td> {{ alb.2 }} </td>   
                     <td> {{ alb.3 }} </td>        
