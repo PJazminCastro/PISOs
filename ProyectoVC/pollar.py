@@ -4,9 +4,9 @@ N = int(input('Ingrese un numero entero: '))
 # pow = potencia
 z = 2
 i = 1
-x_anterior = z - 1  # Inicializamos x_anterior para la primera iteración
+x_anterior = pow(2,2) - 1  # Inicializamos x_anterior para la primera iteración
 
-while i < 4: 
+while i < 4: #se detiene cuando es un número no trivial o primo
     x = pow(z, 2) - 1
     if x > N:
         x = x % N
@@ -21,7 +21,7 @@ while i < 4:
     max_divisor = math.gcd(y - x_anterior, N)
     print(f'Iteración {i}: max_divisor = {max_divisor}')
 
-    x_anterior = x  # Guardamos el valor actual de x para la próxima iteración
+    x_anterior = x  #Guardamos el valor actual de x para la próxima iteración
     z = y
     i = i + 1
 
