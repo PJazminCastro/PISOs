@@ -1,5 +1,6 @@
 import math
 import random
+import time
 
 # Maximo comun divisor; si b ! a 0, intercambia entre a y b valores
 def gcd(a, b):
@@ -58,9 +59,13 @@ def main():
     if n <= 1:
         print("El número debe ser mayor que 1.")
         return
-
+    
+    start_time = time.time()
     factors = factorize(n)
+    end_time = time.time()
+
     print(f"Los factores de {n} son: {factors}")
+    print(f"Tiempo de factorización: {end_time - start_time} segundos")
 
 if __name__ == "__main__":
     main()

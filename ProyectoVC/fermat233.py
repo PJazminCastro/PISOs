@@ -1,11 +1,11 @@
 import math
-from math import sqrt
+import time
 
 def fermats_factorization(n):
     if n % 2 == 0:
         return n // 2, 2  # Para números pares, el factor más grande es n // 2
 
-    k = math.ceil(math.sqrt(n))  # Ceil para  que k sea mayor o igual a la raíz cuadrada de n
+    k = math.ceil(math.sqrt(n))  # Ceil para que k sea mayor o igual a la raíz cuadrada de n
     y = (k * k) - n
     d = 1
 
@@ -31,12 +31,47 @@ def fermats_factorization(n):
             print("No se encontraron factores.")
             return None
 
-n = int(input("Ingrese el número impar a factorizar: "))
-if n <= 1:
-    print("El número debe ser mayor que 1.")
-else:
-    result = fermats_factorization(n)
-    if result:
-        print(f"Los factores de {n} son: {result[0]} y {result[1]}")
+def factorize(n):
+    factors = []
+    stack = [n]
+    while stack:
+        current = stack.pop()
+        if current <= 1:
+            continue
+        if is_prime(current):
+            factors.append(current)
+        else:
+            factor1, factor2 = fermats_factorization(current)
+            stack.append(factor1)
+            stack.append(factor2)
+    return sorted(factors)
 
-        #Volver a factorizar los valores hasta que den primos
+def is_prime(n):
+    if n <= 1:
+        return False
+    if n <= 3:
+        return True
+    if n % 2 == 0 or n % 3 == 0:
+        return False
+    i = 5
+    while i * i <= n:
+        if n % i == 0 or n % (i + 2) == 0:
+            return False
+        i += 6
+    return True
+
+def main():
+    n = int(input("Ingrese el número a factorizar: "))
+    if n <= 1:
+        print("El número debe ser mayor que 1.")
+        return
+    
+    start_time = time.time()
+    factors = factorize(n)
+    end_time = time.time()
+
+    print(f"Los factores de {n} son: {factors}")
+    print(f"Tiempo de factorización: {end_time - start_time} segundos")
+
+if __name__ == "__main__":
+    main()
