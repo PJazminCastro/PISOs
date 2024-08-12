@@ -2,14 +2,13 @@ import math
 import random
 import time
 
-# Maximo comun divisor; si b ! a 0, intercambia entre a y b valores
+# Máximo común divisor
 def gcd(a, b):
     while b != 0:
         a, b = b, a % b
     return a
 
-# Descartas multiplos de 2 y 3, verifica si es divisible hasta llegar a
-# la raiz cuadrada
+# Verifica si un número es primo
 def is_prime(n):
     if n <= 1:
         return False
@@ -27,7 +26,6 @@ def is_prime(n):
 def pollards_rho(n):
     if n % 2 == 0:
         return 2
-    #X, Y, puntos de inicio y C constante
     x = random.randint(2, n - 1)
     y = x
     c = random.randint(1, n - 1)
@@ -64,8 +62,11 @@ def main():
     factors = factorize(n)
     end_time = time.time()
 
+    # Calcular tiempo en milisegundos
+    elapsed_time_ms = (end_time - start_time) * 1000
+
     print(f"Los factores de {n} son: {factors}")
-    print(f"Tiempo de factorización: {end_time - start_time} segundos")
+    print(f"Tiempo de factorización: {elapsed_time_ms:.2f} ms")
 
 if __name__ == "__main__":
     main()

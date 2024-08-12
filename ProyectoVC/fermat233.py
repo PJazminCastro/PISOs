@@ -70,8 +70,11 @@ def main():
     factors = factorize(n)
     end_time = time.time()
 
+    # Calcular tiempo en milisegundos
+    elapsed_time_ms = (end_time - start_time) * 1000
+
     print(f"Los factores de {n} son: {factors}")
-    print(f"Tiempo de factorización: {end_time - start_time} segundos")
+    print(f"Tiempo de factorización: {elapsed_time_ms:.2f} ms")
 
 if __name__ == "__main__":
     main()
